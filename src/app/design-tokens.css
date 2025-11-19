@@ -1,0 +1,127 @@
+:root {
+  /* JARVIS Color Palette - Soft Holographic Interface */
+  --color-bg: #0f1419;
+  --color-bg-secondary: #161b22;
+  --color-bg-tertiary: #1c2128;
+  
+  /* Jarvis Signature Colors - Even Softer */
+  --color-jarvis-primary: #38bdf8;
+  --color-jarvis-secondary: #60a5fa;
+  --color-jarvis-accent: #7dd3fc;
+  --color-jarvis-glow: #38bdf8;
+  
+  /* Arc Reactor Core - Dimmed */
+  --color-reactor-core: #38bdf8;
+  --color-reactor-ring: #0ea5e9;
+  --color-inner-pulse: #7dd3fc;
+  
+  /* Holographic Effects - Muted */
+  --color-holo-blue: #38bdf8;
+  --color-holo-cyan: #22d3ee;
+  --color-holo-teal: #2dd4bf;
+  --color-holo-emerald: #34d399;
+  
+  /* UI Elements - Softer */
+  --color-panel-bg: rgba(22, 27, 34, 0.6);
+  --color-panel-border: rgba(56, 189, 248, 0.15);
+  --color-panel-hover: rgba(56, 189, 248, 0.08);
+  
+  /* Glass Morphism - More Subtle */
+  --color-glass-bg: rgba(22, 27, 34, 0.8);
+  --color-glass-border: rgba(56, 189, 248, 0.12);
+  
+  /* Text Colors - Easier on Eyes */
+  --color-text-primary: #e4e7eb;
+  --color-text-secondary: #9ca3af;
+  --color-text-accent: #60a5fa;
+  --color-text-muted: #6b7280;
+  --color-text-glow: #7dd3fc;
+  
+  /* Metallic & Chrome */
+  --color-metallic: #cbd5e1;
+  --color-chrome: linear-gradient(135deg, #64748b 0%, #94a3b8 50%, #cbd5e1 100%);
+  
+  /* Status Colors - Jarvis Style */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #00d9ff;
+  
+  /* Typography */
+  --font-headline: 'Inter', 'Orbitron', sans-serif;
+  --font-body: 'Inter', 'Roboto', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  
+  /* Spacing Scale */
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  
+  /* Glow & Holographic Effects - Reduced */
+  --glow-blur: 8px;
+  --glow-blur-large: 16px;
+  --glow-blur-xl: 24px;
+  --glow-color: rgba(56, 189, 248, 0.3);
+  --glow-color-secondary: rgba(96, 165, 250, 0.2);
+  --glow-color-tertiary: rgba(34, 211, 238, 0.25);
+  
+  /* Shadows - Softer Jarvis */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.2);
+  --shadow-glow-intense: 0 0 30px rgba(56, 189, 248, 0.3);
+  
+  /* Animations */
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-jarvis: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.6s;
+  --duration-pulse: 2s;
+  
+  /* Breakpoints */
+  --bp-mobile: 768px;
+  --bp-tablet: 1024px;
+  --bp-desktop: 1280px;
+  --bp-wide: 1536px;
+  
+  /* Z-index Scale */
+  --z-base: 1;
+  --z-panel: 10;
+  --z-dropdown: 50;
+  --z-modal: 100;
+  --z-tooltip: 1000;
+  --z-hud: 9999;
+  
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}

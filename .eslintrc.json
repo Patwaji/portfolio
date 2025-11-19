@@ -1,0 +1,11 @@
+{
+  "extends": [
+    "next/core-web-vitals"
+  ],
+  "rules": {
+    "prefer-const": "error",
+    "react/no-unescaped-entities": "off",
+    "react/jsx-no-comment-textnodes": "off",
+    "react-hooks/exhaustive-deps": "warn"
+  }
+}

@@ -1,0 +1,15 @@
+<svg width="180" height="80" viewBox="0 0 180 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="frosted" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="8" result="blur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.7"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect x="8" y="8" width="164" height="64" rx="16" fill="rgba(255,255,255,0.08)" filter="url(#frosted)" stroke="#00E6FF" stroke-width="1.5"/>
+</svg>
