@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { EffectComposer, Bloom } from "@react-three/postprocessing";
+import { EffectComposer, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { ParticleField } from "./ParticleField";
 import { MindCore } from "./MindCore";
@@ -13,8 +13,8 @@ function PointerRig({ pointer, enabled }: { pointer: PointerPos; enabled: boolea
   useFrame((state) => {
     if (!enabled) return;
     const { x, y } = pointer.current;
-    state.camera.position.x = THREE.MathUtils.damp(state.camera.position.x, x * 1.1, 4, 0.016);
-    state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, -y * 0.8, 4, 0.016);
+    state.camera.position.x = THREE.MathUtils.damp(state.camera.position.x, x * 0.6, 4, 0.016);
+    state.camera.position.y = THREE.MathUtils.damp(state.camera.position.y, -y * 0.4, 4, 0.016);
     state.camera.lookAt(0, 0, 0);
   });
   return null;
@@ -37,30 +37,25 @@ export function HeroScene() {
 
   return (
     <Canvas
-      className="pointer-events-none absolute inset-0"
+      className="pointer-events-none h-full w-full"
       dpr={[1, isMobile ? 1.3 : 2]}
-      camera={{ position: [0, 0, 9], fov: 45 }}
+      camera={{ position: [0, 0, 9], fov: 40 }}
       gl={{ antialias: true }}
     >
-      <color attach="background" args={["#030308"]} />
-      <fog attach="fog" args={["#030308", 10, 22]} />
-      <ambientLight intensity={0.4} />
-      <pointLight position={[6, 4, 6]} intensity={40} color="#8b5cf6" />
-      <pointLight position={[-6, -3, -4]} intensity={30} color="#22d3ee" />
+      <color attach="background" args={["#fbf8f2"]} />
+      <fog attach="fog" args={["#fbf8f2", 11, 20]} />
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[5, 6, 6]} intensity={1.1} color="#fff8ec" />
+      <pointLight position={[-5, -3, -3]} intensity={12} color="#b8502f" />
 
       <MindCore />
       <ConstellationNodes />
-      <ParticleField count={isMobile ? 500 : 1100} />
+      <ParticleField count={isMobile ? 350 : 650} />
       <PointerRig pointer={pointer} enabled={!reducedMotion} />
 
       {!isMobile && (
         <EffectComposer>
-          <Bloom
-            luminanceThreshold={0.2}
-            luminanceSmoothing={0.9}
-            intensity={0.7}
-            mipmapBlur
-          />
+          <Vignette eskil={false} offset={0.15} darkness={0.6} />
         </EffectComposer>
       )}
     </Canvas>

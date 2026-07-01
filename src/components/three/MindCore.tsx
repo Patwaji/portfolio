@@ -8,28 +8,26 @@ export function MindCore() {
 
   useFrame((_, delta) => {
     if (wireRef.current) {
-      wireRef.current.rotation.y += delta * 0.15;
-      wireRef.current.rotation.x += delta * 0.05;
+      wireRef.current.rotation.y += delta * 0.1;
+      wireRef.current.rotation.x += delta * 0.03;
     }
   });
 
   return (
-    <Float speed={1.4} rotationIntensity={0.5} floatIntensity={1.1}>
+    <Float speed={1.1} rotationIntensity={0.35} floatIntensity={0.8}>
       <mesh>
         <icosahedronGeometry args={[1.5, 4]} />
         <MeshDistortMaterial
-          color="#8b5cf6"
-          emissive="#6d28d9"
-          emissiveIntensity={0.5}
-          distort={0.35}
-          speed={1.8}
-          roughness={0.2}
-          metalness={0.4}
+          color="#b8502f"
+          distort={0.28}
+          speed={1.2}
+          roughness={0.85}
+          metalness={0}
         />
       </mesh>
       <mesh ref={wireRef}>
-        <icosahedronGeometry args={[1.95, 1]} />
-        <meshBasicMaterial color="#22d3ee" wireframe transparent opacity={0.22} />
+        <icosahedronGeometry args={[1.92, 1]} />
+        <meshBasicMaterial color="#1c1a17" wireframe transparent opacity={0.18} />
       </mesh>
     </Float>
   );

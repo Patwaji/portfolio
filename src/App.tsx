@@ -26,7 +26,7 @@ function AppShell() {
   }, [loading, lenis]);
 
   return (
-    <>
+    <div className="frame-guides">
       {loading && <Preloader onComplete={() => setLoading(false)} />}
       <CustomCursor />
       <Noise />
@@ -40,7 +40,7 @@ function AppShell() {
         <Contact />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
 

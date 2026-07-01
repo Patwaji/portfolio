@@ -22,22 +22,22 @@ export function ConstellationNodes() {
       return {
         position,
         phase: Math.random() * Math.PI * 2,
-        speed: 0.6 + Math.random() * 0.8,
-        color: i % 2 === 0 ? "#22d3ee" : "#c4b5fd",
+        speed: 0.5 + Math.random() * 0.6,
+        color: i % 3 === 0 ? "#7a3018" : "#1c1a17",
       };
     });
   }, []);
 
   useFrame(({ clock }, delta) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y += delta * 0.035;
-      groupRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.05) * 0.15;
+      groupRef.current.rotation.y += delta * 0.028;
+      groupRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.05) * 0.12;
     }
     const t = clock.getElapsedTime();
     nodes.forEach((n, i) => {
       const mesh = nodeRefs.current[i];
       if (!mesh) return;
-      const s = 1 + Math.sin(t * n.speed + n.phase) * 0.35;
+      const s = 1 + Math.sin(t * n.speed + n.phase) * 0.2;
       mesh.scale.setScalar(s);
     });
   });
@@ -48,9 +48,9 @@ export function ConstellationNodes() {
         <Line
           key={`line-${i}`}
           points={[[0, 0, 0], n.position.toArray()]}
-          color={n.color}
+          color="#8a857a"
           transparent
-          opacity={0.18}
+          opacity={0.35}
           lineWidth={1}
         />
       ))}
@@ -62,7 +62,7 @@ export function ConstellationNodes() {
             nodeRefs.current[i] = el;
           }}
         >
-          <sphereGeometry args={[0.085, 16, 16]} />
+          <sphereGeometry args={[0.075, 16, 16]} />
           <meshBasicMaterial color={n.color} />
         </mesh>
       ))}

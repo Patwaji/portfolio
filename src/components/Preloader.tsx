@@ -2,9 +2,9 @@ import { useRef } from "react";
 import { gsap, useGSAP } from "../lib/gsap";
 
 const LOADING_LINES = [
-  "CALIBRATING THE LAB",
-  "INDEXING CURIOSITY",
-  "REMOVING BOUNDARIES",
+  "SETTING THE TYPE",
+  "INKING THE PRESS",
+  "PROOFING THE PAGE",
 ];
 
 export function Preloader({ onComplete }: { onComplete: () => void }) {
@@ -61,7 +61,7 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
   return (
     <div
       ref={rootRef}
-      className="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-6 bg-void"
+      className="fixed inset-0 z-[90] flex flex-col items-center justify-center gap-6 bg-bone"
     >
       <div className="flex items-baseline gap-1 font-display text-[clamp(4rem,14vw,9rem)] font-medium leading-none text-ink">
         <span ref={countRef}>0</span>
@@ -74,7 +74,7 @@ export function Preloader({ onComplete }: { onComplete: () => void }) {
       <div className="h-px w-48 overflow-hidden bg-line">
         <div
           ref={barRef}
-          className="h-full w-full origin-left scale-x-0 bg-gradient-to-r from-violet to-cyan"
+          className="h-full w-full origin-left scale-x-0 bg-rust"
         />
       </div>
     </div>

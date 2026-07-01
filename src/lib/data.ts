@@ -1,17 +1,20 @@
 export const profile = {
   name: "Suryansh Patwa",
   initials: "SP",
+  volume: "VOL. 01 — RESEARCH & BUILDS",
   eyebrow: "A THINKER. A BUILDER. NO FIXED STACK.",
   tagline: "I don't collect frameworks. I collect questions worth sitting with.",
   subline:
     "Currently obsessing over Cogniflow — reading cognitive load off a webcam feed. Everything else, I'll learn the moment it's needed.",
+  figureCaption: "FIG. 01 — A MIND, VISUALIZED",
 };
 
 export const manifesto = {
   eyebrow: "PHILOSOPHY",
   heading: "Limitless isn't a claim. It's a method.",
   paragraph:
-    "Most people pick a lane and stay in it. I never have — and I'm not going to start. Hand me a problem in Python, in C++, in cognitive science, in some language I've never even opened, and the stack stops mattering. What matters is whether the question is worth sitting with. I learn what a problem demands, build what doesn't exist yet, and hold a standard high enough that most of what I make quietly stays in the lab. That isn't indecision. That's R&D, applied to a life.",
+    "Most people pick a lane and stay in it. I never have — and I'm not going to start. Hand me a problem in Python, in C++, in cognitive science, in some language I've never even opened, and the stack stops mattering. What matters is whether the question is worth sitting with. I learn what a problem demands, build what doesn't exist yet, and hold a standard high enough that most of what I make quietly stays in the lab.",
+  pullQuote: "That isn't indecision. That's R&D, applied to a life.",
 };
 
 export type SkillRow = {
@@ -96,3 +99,12 @@ export const navLinks = [
   { label: "Cogniflow", href: "#cogniflow" },
   { label: "Contact", href: "#contact" },
 ];
+
+export const colophon = {
+  heading: "Colophon",
+  lines: [
+    "Set in Fraunces & Inter, with IBM Plex Mono for captions.",
+    "Built with React, Three.js & GSAP.",
+    "Suryansh Patwa © 2026.",
+  ],
+};

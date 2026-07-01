@@ -22,17 +22,22 @@ export function Lab() {
   return (
     <section
       ref={sectionRef}
-      className="relative bg-void px-6 py-28 text-center md:px-12 md:py-36"
+      className="relative border-t border-line bg-bone-deep px-6 py-24 md:px-12 md:py-32"
     >
-      <h2
-        data-reveal
-        className="mx-auto max-w-2xl font-display text-[clamp(1.8rem,4.5vw,3rem)] font-medium text-ink"
-      >
-        {lab.heading}
-      </h2>
-      <p data-reveal className="mx-auto mt-6 max-w-xl text-sm text-ink-dim md:text-base">
-        {lab.paragraph}
-      </p>
+      <div className="mx-auto max-w-xl border-l-2 border-rust pl-6 md:pl-8">
+        <div data-reveal className="mb-3 font-mono text-[10px] tracking-[0.25em] text-rust uppercase">
+          Editor&rsquo;s Note
+        </div>
+        <h2
+          data-reveal
+          className="font-display text-[clamp(1.5rem,3.5vw,2.25rem)] text-ink italic"
+        >
+          {lab.heading}
+        </h2>
+        <p data-reveal className="mt-4 text-sm text-ink-dim md:text-base">
+          {lab.paragraph}
+        </p>
+      </div>
     </section>
   );
 }

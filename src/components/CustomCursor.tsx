@@ -33,7 +33,7 @@ export function CustomCursor() {
     const onOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (target.closest("[data-cursor-hover]")) {
-        gsap.to(ring, { scale: 2.2, opacity: 0.5, duration: 0.35, ease: "power3.out" });
+        gsap.to(ring, { scale: 1.7, opacity: 0.6, duration: 0.35, ease: "power3.out" });
         gsap.to(dot, { scale: 0, duration: 0.25 });
       }
     };
@@ -63,11 +63,11 @@ export function CustomCursor() {
     <>
       <div
         ref={dotRef}
-        className="pointer-events-none fixed top-0 left-0 z-[100] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan"
+        className="force-circle pointer-events-none fixed top-0 left-0 z-[100] h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 bg-rust"
       />
       <div
         ref={ringRef}
-        className="pointer-events-none fixed top-0 left-0 z-[100] h-9 w-9 -translate-x-1/2 -translate-y-1/2 rounded-full border border-violet-soft/70"
+        className="force-circle pointer-events-none fixed top-0 left-0 z-[100] h-9 w-9 -translate-x-1/2 -translate-y-1/2 border border-ink/50"
       />
     </>
   );

@@ -25,18 +25,15 @@ export function Contact() {
     <section
       ref={sectionRef}
       id="contact"
-      className="relative overflow-hidden bg-void px-6 py-32 text-center md:px-12 md:py-48"
+      className="relative border-t border-line bg-bone px-6 py-28 text-center md:px-12 md:py-40"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_50%_50%_at_50%_50%,rgba(139,92,246,0.14),transparent_70%)]"
-      />
-
       <div className="relative z-10 flex flex-col items-center">
         <div
           data-reveal
-          className="mb-6 font-mono text-xs tracking-[0.3em] text-violet-soft uppercase"
+          className="mb-6 flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-rust uppercase"
         >
+          <span className="text-ink-faint">04</span>
+          <span className="h-px w-8 bg-rust/50" />
           {contact.eyebrow}
         </div>
         <h2
@@ -52,10 +49,10 @@ export function Contact() {
         <MagneticButton className="mt-12" strength={0.25}>
           <a
             href={`mailto:${contact.email}`}
-            className="group flex items-center gap-3 rounded-full border border-line bg-surface px-8 py-4 font-display text-lg text-ink transition-colors hover:border-violet-soft md:text-2xl"
+            className="group flex items-center gap-3 border border-ink px-8 py-4 font-display text-lg text-ink transition-colors hover:bg-ink hover:text-bone md:text-2xl"
           >
             {contact.email}
-            <ArrowUpRight className="h-5 w-5 text-violet-soft transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+            <ArrowUpRight className="h-5 w-5 text-rust transition-transform group-hover:translate-x-1 group-hover:-translate-y-1 group-hover:text-bone" />
           </a>
         </MagneticButton>
 
@@ -66,7 +63,7 @@ export function Contact() {
                 href={link.href}
                 target="_blank"
                 rel="noreferrer"
-                className="font-mono text-xs tracking-[0.2em] text-ink-dim uppercase transition-colors hover:text-ink"
+                className="border-b border-transparent pb-0.5 font-mono text-xs tracking-[0.2em] text-ink-dim uppercase transition-colors hover:border-rust hover:text-ink"
               >
                 {link.label}
               </a>

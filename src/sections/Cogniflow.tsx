@@ -64,35 +64,35 @@ export function Cogniflow() {
     <section
       ref={sectionRef}
       id="cogniflow"
-      className="relative bg-surface px-6 py-32 md:px-12 md:py-44"
+      className="relative border-t border-line bg-bone px-6 py-28 md:px-12 md:py-40"
     >
       <div
         data-reveal
-        className="mb-10 flex items-center gap-3 font-mono text-[11px] tracking-[0.25em] text-amber uppercase"
+        className="mb-10 inline-flex items-center gap-3 border border-line px-3 py-1.5 font-mono text-[11px] tracking-[0.25em] text-rust uppercase"
       >
-        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber" />
+        <span className="force-circle h-1.5 w-1.5 animate-pulse bg-rust" />
         {cogniflow.status}
       </div>
 
-      <div className="grid gap-16 lg:grid-cols-2 lg:gap-12">
-        <div className="flex flex-col gap-8">
+      <div className="grid min-w-0 gap-16 lg:grid-cols-2 lg:gap-16">
+        <div className="flex min-w-0 flex-col gap-8">
           <div data-reveal>
-            <div className="mb-3 font-mono text-xs tracking-[0.3em] text-violet-soft uppercase">
+            <div className="mb-3 flex items-center gap-3 font-mono text-xs tracking-[0.3em] text-rust uppercase">
+              <span className="text-ink-faint">03</span>
+              <span className="h-px w-8 bg-rust/50" />
               {cogniflow.eyebrow}
             </div>
             <h2 className="font-display text-[clamp(2.5rem,6vw,4.5rem)] leading-none font-medium text-ink">
               {cogniflow.name}
             </h2>
-            <p className="mt-3 font-display text-lg text-gradient md:text-xl">
-              {cogniflow.oneLiner}
-            </p>
+            <p className="pull-quote mt-4 text-lg md:text-xl">{cogniflow.oneLiner}</p>
           </div>
 
-          <p data-reveal className="max-w-xl text-base leading-relaxed text-ink-dim md:text-lg">
+          <p data-reveal className="dropcap max-w-xl text-base leading-relaxed text-ink md:text-lg">
             {cogniflow.abstract}
           </p>
 
-          <div data-reveal className="grid grid-cols-2 gap-8">
+          <div data-reveal className="grid grid-cols-2 gap-8 border-t border-line pt-8">
             <div>
               <div className="mb-3 font-mono text-[10px] tracking-[0.2em] text-ink-faint uppercase">
                 Measuring
@@ -100,7 +100,7 @@ export function Cogniflow() {
               <ul className="flex flex-col gap-2">
                 {cogniflow.method.map((m) => (
                   <li key={m} className="flex items-center gap-2 text-sm text-ink">
-                    <span className="h-1 w-1 rounded-full bg-cyan" />
+                    <span className="force-circle h-1 w-1 bg-rust" />
                     {m}
                   </li>
                 ))}
@@ -113,7 +113,7 @@ export function Cogniflow() {
               <ul className="flex flex-col gap-2">
                 {cogniflow.validation.map((v) => (
                   <li key={v} className="flex items-center gap-2 text-sm text-ink">
-                    <span className="h-1 w-1 rounded-full bg-violet-soft" />
+                    <span className="force-circle h-1 w-1 bg-ink-faint" />
                     {v}
                   </li>
                 ))}
@@ -121,7 +121,7 @@ export function Cogniflow() {
             </div>
           </div>
 
-          <p data-reveal className="text-sm text-ink-faint italic">
+          <p data-reveal className="border-t border-line pt-6 text-sm text-ink-faint italic">
             {cogniflow.closingLine}
           </p>
 
@@ -129,7 +129,7 @@ export function Cogniflow() {
             {cogniflow.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-line px-3 py-1 font-mono text-[10px] tracking-wide text-ink-dim uppercase"
+                className="border border-line px-3 py-1 font-mono text-[10px] tracking-wide text-ink-dim uppercase"
               >
                 {tag}
               </span>
@@ -137,11 +137,14 @@ export function Cogniflow() {
           </div>
         </div>
 
-        <div data-reveal className="flex flex-col gap-8">
-          <div className="aspect-square w-full rounded-2xl border border-line bg-void-soft p-6">
+        <div data-reveal className="flex min-w-0 flex-col gap-3">
+          <div className="aspect-square w-full border border-line bg-paper p-6">
             <GazeScanner />
           </div>
-          <div className="grid grid-cols-3 gap-4">
+          <div className="flex items-center justify-between font-mono text-[10px] tracking-[0.15em] text-ink-faint uppercase">
+            <span className="truncate">FIG. 02 — GAZE TRACKING, SIMULATED</span>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-4">
             {cogniflow.readouts.map((r) => (
               <Readout key={r.label} {...r} />
             ))}

@@ -7,7 +7,8 @@ import { usePrefersReducedMotion } from "../hooks/useMediaQuery";
 export function Philosophy() {
   const sectionRef = useRef<HTMLElement>(null);
   const headingWrapRef = useRef<HTMLDivElement>(null);
-  const paraRef = useRef<HTMLParagraphElement>(null);
+  const paraRef = useRef<HTMLSpanElement>(null);
+  const quoteRef = useRef<HTMLParagraphElement>(null);
   const reducedMotion = usePrefersReducedMotion();
 
   useGSAP(
@@ -23,6 +24,17 @@ export function Philosophy() {
         },
       });
 
+      gsap.from(quoteRef.current, {
+        opacity: 0,
+        y: 24,
+        duration: 1,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: quoteRef.current,
+          start: "top 85%",
+        },
+      });
+
       if (!paraRef.current) return;
 
       const split = SplitText.create(paraRef.current, { type: "words" });
@@ -32,7 +44,7 @@ export function Philosophy() {
         return;
       }
 
-      gsap.set(split.words, { opacity: 0.14 });
+      gsap.set(split.words, { opacity: 0.16 });
 
       gsap.to(split.words, {
         opacity: 1,
@@ -53,21 +65,27 @@ export function Philosophy() {
     <section
       ref={sectionRef}
       id="philosophy"
-      className="relative bg-void px-6 py-32 md:px-12 md:py-44"
+      className="relative border-t border-line bg-bone px-6 py-28 md:px-12 md:py-40"
     >
       <div ref={headingWrapRef}>
         <SectionHeading
+          number="01"
           eyebrow={manifesto.eyebrow}
           heading={manifesto.heading}
-          className="mb-16 md:mb-24"
+          className="mb-16 md:mb-20"
         />
       </div>
 
+      <p className="max-w-3xl text-[clamp(1.2rem,2.4vw,1.6rem)] leading-[1.55] text-ink">
+        <span className="dropcap-letter">{manifesto.paragraph[0]}</span>
+        <span ref={paraRef}>{manifesto.paragraph.slice(1)}</span>
+      </p>
+
       <p
-        ref={paraRef}
-        className="max-w-4xl font-display text-[clamp(1.4rem,3.4vw,2.6rem)] leading-[1.35] font-normal text-ink"
+        ref={quoteRef}
+        className="pull-quote mt-12 max-w-2xl text-[clamp(1.6rem,3.4vw,2.4rem)] md:ml-16"
       >
-        {manifesto.paragraph}
+        {manifesto.pullQuote}
       </p>
     </section>
   );

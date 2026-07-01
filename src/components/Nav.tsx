@@ -30,25 +30,21 @@ export function Nav() {
   };
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50">
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-line bg-bone">
       <div
         ref={progressRef}
-        className="h-[2px] w-full origin-left scale-x-0 bg-gradient-to-r from-violet via-violet-soft to-cyan"
+        className="h-[2px] w-full origin-left scale-x-0 bg-rust"
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-28 backdrop-blur-md [background:linear-gradient(to_bottom,var(--color-void)_0%,var(--color-void)_55%,transparent_100%)]"
-      />
-      <nav className="relative flex items-center justify-between px-6 py-5 md:px-12">
+      <nav className="flex items-center justify-between px-6 py-4 md:px-12">
         <a
           href="#top"
           onClick={goTo("#top")}
           data-cursor-hover
-          className="font-display text-lg font-medium tracking-wide text-ink"
+          className="font-display text-xl text-ink italic"
           aria-label={`${profile.name} — back to top`}
         >
           {profile.initials}
-          <span className="text-violet-soft">.</span>
+          <span className="text-rust">.</span>
         </a>
 
         <div className="hidden items-center gap-8 md:flex">
@@ -58,7 +54,7 @@ export function Nav() {
               href={link.href}
               onClick={goTo(link.href)}
               data-cursor-hover
-              className="font-mono text-xs tracking-[0.2em] text-ink-dim uppercase transition-colors hover:text-ink"
+              className="border-b border-transparent pb-0.5 font-mono text-xs tracking-[0.2em] text-ink-dim uppercase transition-colors hover:border-rust hover:text-ink"
             >
               {link.label}
             </a>
@@ -69,7 +65,7 @@ export function Nav() {
           <a
             href="#contact"
             onClick={goTo("#contact")}
-            className="rounded-full border border-line px-4 py-2 font-mono text-xs tracking-[0.2em] text-ink uppercase transition-colors hover:border-violet-soft hover:text-violet-soft"
+            className="border border-ink px-4 py-2 font-mono text-xs tracking-[0.2em] text-ink uppercase transition-colors hover:bg-ink hover:text-bone"
           >
             Say Hi
           </a>
