@@ -1,90 +1,152 @@
 export const profile = {
   name: "Suryansh Patwa",
   initials: "SP",
-  volume: "VOL. 01 — RESEARCH & BUILDS",
+  system: "SP//MIND",
+  version: "v3.0",
   eyebrow: "A THINKER. A BUILDER. NO FIXED STACK.",
   tagline: "I don't collect frameworks. I collect questions worth sitting with.",
-  subline:
-    "Currently obsessing over Cogniflow — reading cognitive load off a webcam feed. Everything else, I'll learn the moment it's needed.",
-  figureCaption: "FIG. 01 — A MIND, VISUALIZED",
 };
 
-export const manifesto = {
-  eyebrow: "PHILOSOPHY",
-  heading: "Limitless isn't a claim. It's a method.",
-  paragraph:
-    "Most people pick a lane and stay in it. I never have — and I'm not going to start. Hand me a problem in Python, in C++, in cognitive science, in some language I've never even opened, and the stack stops mattering. What matters is whether the question is worth sitting with. I learn what a problem demands, build what doesn't exist yet, and hold a standard high enough that most of what I make quietly stays in the lab.",
-  pullQuote: "That isn't indecision. That's R&D, applied to a life.",
+export type MindNode = {
+  id: "philosophy" | "arsenal" | "cogniflow" | "lab" | "signal";
+  index: number;
+  code: string;
+  title: string;
+  /** short line shown in the HUD caption during the guided tour */
+  blurb: string;
+  position: [number, number, number];
+  /** accent color for the node's glow + panel */
+  accent: string;
+  scale: number;
 };
 
-export type SkillRow = {
-  label: string;
-  items: string[];
-  direction: "left" | "right";
-};
-
-export const skillRows: SkillRow[] = [
+export const nodes: MindNode[] = [
   {
-    label: "Languages",
-    direction: "left",
-    items: ["JavaScript", "TypeScript", "Python", "C", "C++"],
+    id: "philosophy",
+    index: 0,
+    code: "N-01 · AXIOMS",
+    title: "PHILOSOPHY",
+    blurb: "The operating principles. Why 'no fixed stack' is a method, not a mood.",
+    position: [-7.6, 2.4, -3.2],
+    accent: "#4ff0d1",
+    scale: 1,
   },
   {
-    label: "Frameworks & Motion",
-    direction: "right",
-    items: ["React", "Next.js", "React Native", "Vite", "GSAP", "HTML", "CSS"],
+    id: "arsenal",
+    index: 1,
+    code: "N-02 · TOOLKIT",
+    title: "ARSENAL",
+    blurb: "Not a checklist — a toolbox. Picked up when a problem demanded it.",
+    position: [6.9, -1.8, -5.2],
+    accent: "#9d7bff",
+    scale: 1,
   },
   {
-    label: "Data & Infra",
-    direction: "left",
-    items: ["MongoDB", "PostgreSQL", "REST APIs", "GraphQL", "Axios"],
+    id: "cogniflow",
+    index: 2,
+    code: "N-03 · FLAGSHIP",
+    title: "COGNIFLOW",
+    blurb: "Reading cognitive load off a webcam. The question I'm sitting with right now.",
+    position: [8.2, 1.9, 3.4],
+    accent: "#ff5fd2",
+    scale: 1.45,
+  },
+  {
+    id: "lab",
+    index: 3,
+    code: "N-04 · SEALED",
+    title: "THE LAB",
+    blurb: "Where most of my work lives — and stays, until it survives my own standards.",
+    position: [-6.2, -2.9, 5.0],
+    accent: "#5fb8ff",
+    scale: 1,
+  },
+  {
+    id: "signal",
+    index: 4,
+    code: "N-05 · UPLINK",
+    title: "SIGNAL",
+    blurb: "Open channel. For questions worth sitting with — not for résumés.",
+    position: [1.4, 4.8, -8.2],
+    accent: "#b8ff5f",
+    scale: 1,
   },
 ];
 
+export const bootLines = [
+  "> initializing mind_core .............. OK",
+  "> loading axioms ...................... OK",
+  "> calibrating gaze tracker ............ OK",
+  "> hypotheses loaded ................... 47",
+  "> fixed stack ......................... NOT FOUND",
+  "> curiosity ........................... UNBOUNDED",
+  "> mounting consciousness ..............",
+];
+
+export const tour = {
+  intro: {
+    kicker: "SUBJECT: SURYANSH PATWA",
+    title: "You are inside a mind.",
+    sub: "Scroll to move through it. You drive — nothing moves without you.",
+  },
+  outro: {
+    kicker: "SYNC COMPLETE",
+    title: "The mind is yours now.",
+    sub: "Drag to orbit. Click any node to open it.",
+  },
+};
+
+export const philosophy = {
+  heading: "Limitless isn't a claim. It's a method.",
+  body: "Most people pick a lane and stay in it. I never have — and I'm not going to start. Hand me a problem in Python, in C++, in cognitive science, in some language I've never even opened, and the stack stops mattering. What matters is whether the question is worth sitting with. I learn what a problem demands, build what doesn't exist yet, and hold a standard high enough that most of what I make quietly stays in the lab.",
+  pullQuote: "That isn't indecision. That's R&D, applied to a life.",
+};
+
+export type SkillRow = { label: string; items: string[] };
+
 export const arsenal = {
-  eyebrow: "ARSENAL",
   heading: "Not a checklist. A toolbox.",
-  sub: "Fluency isn't the goal, capability is. If a problem needs a tool I don't have yet, I pick it up and keep moving.",
+  sub: "Fluency isn't the goal — capability is. If a problem needs a tool I don't have yet, I pick it up and keep moving.",
+  rows: [
+    {
+      label: "LANGUAGES",
+      items: ["JavaScript", "TypeScript", "Python", "C", "C++"],
+    },
+    {
+      label: "FRAMEWORKS & MOTION",
+      items: ["React", "Next.js", "React Native", "Vite", "GSAP", "Three.js"],
+    },
+    {
+      label: "DATA & INFRA",
+      items: ["MongoDB", "PostgreSQL", "REST APIs", "GraphQL", "Axios"],
+    },
+  ] as SkillRow[],
 };
 
 export const cogniflow = {
   status: "RESEARCH · IN PROGRESS · NOT YET LIVE",
-  eyebrow: "FLAGSHIP WORK",
-  name: "Cogniflow",
   oneLiner: "Reading cognitive load off a webcam.",
   abstract:
     "Cogniflow estimates cognitive engagement in real time using nothing but a standard webcam — tracking pupil dynamics, blink behaviour, gaze stability, and facial tension to infer how hard a mind is working, moment to moment.",
   closingLine:
     "No wearables. No lab equipment. Just a camera, a hypothesis, and the data to back it up.",
-  method: [
-    "Pupil dynamics",
-    "Blink behaviour",
-    "Gaze stability",
-    "Facial tension",
-  ],
-  validation: [
-    "NASA-TLX questionnaires",
-    "N-back cognitive tests",
-    "Retrospective user confirmation",
-  ],
+  method: ["Pupil dynamics", "Blink behaviour", "Gaze stability", "Facial tension"],
+  validation: ["NASA-TLX questionnaires", "N-back cognitive tests", "Retrospective user confirmation"],
   tags: ["Computer Vision", "Cognitive Science", "Python", "Applied Research"],
-  readouts: [
-    { label: "Engagement", value: 74, unit: "%" },
-    { label: "Blink Rate", value: 14, unit: "/min" },
-    { label: "Gaze Stability", value: 82, unit: "%" },
-  ],
 };
 
 export const lab = {
   heading: "More is brewing.",
-  paragraph:
-    "I build constantly — most of it never leaves the lab. What's not here yet isn't gone; it's either still cooking, or it didn't survive contact with my own standards. Cogniflow made the cut. More will, eventually.",
+  body: "I build constantly — most of it never leaves this room. What's not here isn't gone; it's either still cooking, or it didn't survive contact with my own standards. Cogniflow made the cut. More will.",
+  teaser:
+    "Coming to this space: playable experiments. Games, toys, things you can break. Each one will dock here as a new node in the mind.",
+  buttonLabel: "DESTABILIZE THE MIND",
+  buttonHint: "go on. poke it.",
 };
 
-export const contact = {
-  eyebrow: "GET IN TOUCH",
+export const signal = {
   heading: "Got a question worth sitting with?",
-  sub: "This isn't the résumé version of me — I've already got one of those for job hunting. This is where the interesting stuff goes.",
+  sub: "This isn't the résumé version of me — I've got one of those elsewhere. This channel is for the interesting stuff.",
   email: "hello@suryanshpatwa.dev",
   links: [
     { label: "GitHub", href: "https://github.com/suryanshpatwa" },
@@ -93,18 +155,8 @@ export const contact = {
   ],
 };
 
-export const navLinks = [
-  { label: "Philosophy", href: "#philosophy" },
-  { label: "Arsenal", href: "#arsenal" },
-  { label: "Cogniflow", href: "#cogniflow" },
-  { label: "Contact", href: "#contact" },
+export const colophon = [
+  "Set in Space Grotesk & JetBrains Mono.",
+  "Built with Vite, React, Three.js & GSAP.",
+  "Suryansh Patwa © 2026.",
 ];
-
-export const colophon = {
-  heading: "Colophon",
-  lines: [
-    "Set in Fraunces & Inter, with IBM Plex Mono for captions.",
-    "Built with React, Three.js & GSAP.",
-    "Suryansh Patwa © 2026.",
-  ],
-};
