@@ -1,0 +1,296 @@
+{
+  "registryVersion": 1,
+  "assetRoot": "assets/mint",
+  "assets": {
+    "arsenal-node": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7af3trhsx50vrtajen5prn1n8az6kh"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "arsenal-cluster-original.glb",
+          "localPath": "assets/mint/arsenal-node/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 989132,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "arsenal-cluster-preview.webp",
+          "localPath": "assets/mint/arsenal-node/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 112424
+        }
+      },
+      "thumbnailUrl": "assets/mint/arsenal-node/preview_image.webp"
+    },
+    "cogniflow-iris": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7bby7g94b21a32rdww0gq8an8ax2vz"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "source_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "iridescent-gunmetal-iris-an8ax2vz-original.glb",
+          "localPath": "assets/mint/cogniflow-iris/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1051436,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "iridescent-gunmetal-iris-an8ax2vz-preview.webp",
+          "localPath": "assets/mint/cogniflow-iris/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 89946
+        }
+      },
+      "thumbnailUrl": "assets/mint/cogniflow-iris/preview_image.webp"
+    },
+    "lab-node": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks7279qkszmr54yhf2xa6gzjrh8ay4zm"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "lab-capsule-original.glb",
+          "localPath": "assets/mint/lab-node/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1053768,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "lab-capsule-preview.webp",
+          "localPath": "assets/mint/lab-node/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 50728
+        }
+      },
+      "thumbnailUrl": "assets/mint/lab-node/preview_image.webp"
+    },
+    "philosophy-node": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks757rkc0qwhe367wzd5pbgnrx8az6hf"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "philosophy-keystone-original.glb",
+          "localPath": "assets/mint/philosophy-node/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1009316,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "philosophy-keystone-preview.webp",
+          "localPath": "assets/mint/philosophy-node/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 41948
+        }
+      },
+      "thumbnailUrl": "assets/mint/philosophy-node/preview_image.webp"
+    },
+    "signal-node": {
+      "source": {
+        "manifestVersion": 1,
+        "kind": "asset",
+        "assetType": "model",
+        "assetId": "ks72cj6s72hw1wfhjgs4xjkqzx8ay0tb"
+      },
+      "transform": {
+        "position": [
+          0,
+          0,
+          0
+        ],
+        "rotation": [
+          0,
+          0,
+          0
+        ],
+        "scale": [
+          1,
+          1,
+          1
+        ]
+      },
+      "mode": "local_files",
+      "artifacts": {
+        "original_glb": {
+          "artifactId": "original_glb",
+          "role": "canonical_model",
+          "format": "glb",
+          "contentType": "model/gltf-binary",
+          "filename": "signal-beacon-original.glb",
+          "localPath": "assets/mint/signal-node/original_glb.glb",
+          "loaderHint": "gltf",
+          "byteSize": 1156700,
+          "extensionsUsed": [],
+          "extensionsRequired": [],
+          "usesDraco": false,
+          "requiresDraco": false,
+          "usesMeshopt": false,
+          "requiresMeshopt": false,
+          "usesKtx2": false,
+          "requiresKtx2": false,
+          "unknownRequiredExtensions": []
+        },
+        "preview_image": {
+          "artifactId": "preview_image",
+          "role": "preview_image",
+          "format": "webp",
+          "contentType": "image/webp",
+          "filename": "signal-beacon-preview.webp",
+          "localPath": "assets/mint/signal-node/preview_image.webp",
+          "loaderHint": "image",
+          "byteSize": 121178
+        }
+      },
+      "thumbnailUrl": "assets/mint/signal-node/preview_image.webp"
+    }
+  }
+}

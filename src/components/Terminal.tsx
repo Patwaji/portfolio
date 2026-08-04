@@ -14,6 +14,8 @@ export type TerminalApi = {
   aurora: () => void;
   sound: (on: boolean) => void;
   sudoHire: () => void;
+  fingerprint: () => string;
+  playCatch: () => string;
   visited: () => Set<string>;
   close: () => void;
 };
@@ -64,6 +66,8 @@ export function Terminal({ api }: { api: TerminalApi }) {
             "  open <node>     fly to a node (open cogniflow)",
             "  tour            replay the guided tour",
             "  achievements    what you've earned",
+            "  fingerprint     your real session, read back to you",
+            "  catch           catch the thought — a real minigame",
             "  destabilize     shake the mind",
             "  gravity         pull particles to your cursor (10s)",
             "  excite          overclock the core (6s)",
@@ -128,6 +132,15 @@ export function Terminal({ api }: { api: TerminalApi }) {
         ]);
         break;
       }
+
+      case "fingerprint":
+        print([{ text: api.fingerprint(), cls: "ok" }]);
+        break;
+
+      case "catch":
+      case "play":
+        print([{ text: api.playCatch(), cls: "ok" }]);
+        break;
 
       case "destabilize":
         api.destabilize();

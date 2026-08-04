@@ -9,10 +9,36 @@
       name="description"
       content="Suryansh Patwa — a thinker, a builder, no fixed stack. Step inside the mind."
     />
+    <meta property="og:title" content="Suryansh Patwa — Inside a Mind" />
+    <meta
+      property="og:description"
+      content="An explorable mind: aurora particles, a neural terminal, playable experiments. Not the résumé portfolio — the other one."
+    />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
     <title>Suryansh Patwa — Inside a Mind</title>
+    <style>
+      /* pre-JS shell: paints instantly while the bundle loads */
+      html, body { margin: 0; background: #030308; }
+      .boot-shell {
+        position: fixed; inset: 0;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center; gap: 14px;
+        font-family: ui-monospace, "SF Mono", monospace;
+        color: #e9ecff;
+      }
+      .boot-shell b { font-size: 13px; letter-spacing: 0.16em; }
+      .boot-shell i {
+        font-style: normal; font-size: 9px; letter-spacing: 0.3em;
+        color: #565a75; animation: shell-pulse 1.3s ease-in-out infinite;
+      }
+      @keyframes shell-pulse { 50% { opacity: 0.25; } }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot-shell"><b>SP//MIND</b><i>ESTABLISHING LINK…</i></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

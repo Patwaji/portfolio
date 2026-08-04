@@ -4,11 +4,43 @@ import type { MindNode } from "../lib/data";
 
 type Mode = "boot" | "tour" | "free" | "focus";
 
+const SCRAMBLE = "!<>-_\\/[]{}—=+*^?#";
+
+/** Terminal-style text scramble whenever the value changes. */
+function useScramble(value: string) {
+  const [display, setDisplay] = useState(value);
+  useEffect(() => {
+    let frame = 0;
+    const iv = window.setInterval(() => {
+      frame++;
+      const reveal = Math.ceil((frame * value.length) / 12);
+      if (reveal >= value.length) {
+        setDisplay(value);
+        window.clearInterval(iv);
+        return;
+      }
+      setDisplay(
+        value
+          .split("")
+          .map((c, i) =>
+            i < reveal || c === " "
+              ? c
+              : SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)]
+          )
+          .join("")
+      );
+    }, 30);
+    return () => window.clearInterval(iv);
+  }, [value]);
+  return display;
+}
+
 export function Hud({
   mode,
   focusedId,
   visited,
   soundOn,
+  drowsy,
   hintVisible,
   achCount,
   achTotal,
@@ -21,6 +53,7 @@ export function Hud({
   focusedId: MindNode["id"] | null;
   visited: Set<string>;
   soundOn: boolean;
+  drowsy: boolean;
   hintVisible: boolean;
   achCount: number;
   achTotal: number;
@@ -42,14 +75,17 @@ export function Hud({
   }, []);
 
   const focusedNode = nodes.find((n) => n.id === focusedId);
-  const status =
-    mode === "boot"
-      ? "BOOTING…"
-      : mode === "tour"
-        ? "GUIDED SYNC // YOU DRIVE"
-        : mode === "focus" && focusedNode
-          ? `FOCUS // ${focusedNode.code}`
-          : "FREE ROAM // MIND UNLOCKED";
+  const status = useScramble(
+    drowsy
+      ? "DRIFTING… // TOUCH TO WAKE"
+      : mode === "boot"
+        ? "BOOTING…"
+        : mode === "tour"
+          ? "GUIDED SYNC // YOU DRIVE"
+          : mode === "focus" && focusedNode
+            ? `FOCUS // ${focusedNode.code}`
+            : "FREE ROAM // MIND UNLOCKED"
+  );
 
   return (
     <div className="hud">

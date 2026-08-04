@@ -7,6 +7,24 @@ export const profile = {
   tagline: "I don't collect frameworks. I collect questions worth sitting with.",
 };
 
+/** Loose half-formed thoughts for the Catch the Thought minigame. */
+export const thoughtFragments = [
+  "no fixed stack",
+  "worth sitting with",
+  "build first, ask later",
+  "most of this stays in the lab",
+  "still not sure this works",
+  "the question, not the answer",
+  "i'll learn it when i need it",
+  "not for a job",
+  "a mind, not a resume",
+  "cogniflow, unfinished",
+  "hold a standard, not a title",
+  "curiosity over completion",
+  "what if the stack doesn't matter",
+  "R&D, applied to a life",
+];
+
 export type MindNode = {
   id: "philosophy" | "arsenal" | "cogniflow" | "lab" | "signal";
   index: number;
@@ -100,6 +118,14 @@ export const philosophy = {
   heading: "Limitless isn't a claim. It's a method.",
   body: "Most people pick a lane and stay in it. I never have — and I'm not going to start. Hand me a problem in Python, in C++, in cognitive science, in some language I've never even opened, and the stack stops mattering. What matters is whether the question is worth sitting with. I learn what a problem demands, build what doesn't exist yet, and hold a standard high enough that most of what I make quietly stays in the lab.",
   pullQuote: "That isn't indecision. That's R&D, applied to a life.",
+  originHeading: "HOW I GOT HERE",
+  originParagraphs: [
+    "I started coding for the obvious reason — a good package, a good company. Then college happened, and it taught me the opposite of what I actually wanted: assignments instead of skill, a technical degree that technically taught nothing.",
+    "Somewhere in the middle of it, I fell for someone. I told her. She said yes, and she started pushing me toward goals I'd quietly stopped chasing. Right in the middle of that, I hit the darkest period of my life — real depression, the kind that changes how you see everything that comes after. She stayed through it. I'm on the other side now, and I see things differently because of it.",
+    "The first thing I saw clearly: college wasn't building anything in me, just burying it under coursework. So I left — my family didn't support it, and I made the call anyway, on my own terms. Not long after, I lost my grandfather, and I moved to Bengaluru to actually build something instead of talking about it.",
+    "The turn that mattered most: I built an app for Katha, a rough beta full of holes. Fixing it properly meant researching for the first time — and I fell for the research harder than I'd fallen for the app. That became my style.",
+  ],
+  originQuote: "Cogniflow is what happens when that style finally meets a question worth years, not weeks.",
 };
 
 export type SkillRow = { label: string; items: string[] };

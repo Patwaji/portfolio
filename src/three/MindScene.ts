@@ -3,8 +3,9 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import gsap from "gsap";
-import { nodes, type MindNode } from "../lib/data";
+import { nodes, thoughtFragments, type MindNode } from "../lib/data";
 import {
   coreVertex,
   coreFragment,
@@ -18,13 +19,21 @@ import {
 
 export type SceneMode = "boot" | "tour" | "free" | "focus";
 
-export type SceneSignal = "core-touch" | "zoom-min" | "shockwave";
+export type SceneSignal = "core-touch" | "zoom-min" | "shockwave" | "well-drop";
+
+export type RestoreResult = { caught: number; total: number; ms: number };
 
 export type SceneEvents = {
   onNodeHover: (id: MindNode["id"] | null) => void;
   onNodeClick: (id: MindNode["id"]) => void;
   onTourProgress: (p: number) => void;
   onSignal: (signal: SceneSignal) => void;
+  onRestoreTick: (caught: number, total: number, msLeft: number) => void;
+  onRestoreEnd: (result: RestoreResult) => void;
+  onThoughtSpawn: (id: number, phrase: string) => void;
+  onThoughtGone: (id: number, caught: boolean) => void;
+  onThoughtScore: (score: number, combo: number, misses: number) => void;
+  onThoughtGameOver: (score: number) => void;
 };
 
 export const TOUR_SEGMENTS = nodes.length + 1; // intro -> 5 nodes -> overview
@@ -110,23 +119,113 @@ export class MindScene {
   private timeScaleBase = 1;
   private signalled = new Set<SceneSignal>();
 
+  // --- dropped gravity wells (click-to-place toy) ---
+  private static readonly MAX_WELLS = 4;
+  private static readonly WELL_LIFE = 9; // seconds
+  private wells: { pos: THREE.Vector3; bornAt: number }[] = [];
+  private wellPosUniform: THREE.Vector3[] = Array.from(
+    { length: MindScene.MAX_WELLS },
+    () => new THREE.Vector3()
+  );
+  private wellStrengthUniform = new Float32Array(MindScene.MAX_WELLS);
+
+  // --- Restore the Mind (catch-the-motes game) ---
+  private motes: {
+    id: number;
+    mesh: THREE.Mesh;
+    mat: THREE.ShaderMaterial;
+    hit: THREE.Mesh;
+    pos: THREE.Vector3;
+    vel: THREE.Vector3;
+    phase: number;
+    caught: boolean;
+    caughtAt: number;
+  }[] = [];
+  private restoreActive = false;
+  private restoreStartedAt = 0;
+  private restoreEndsAt = 0;
+  private restoreCaught = 0;
+  private restoreTotal = 0;
+  private moteIdSeq = 0;
+
+  // --- adaptive quality ---
+  private fpsFrames = 0;
+  private fpsAcc = 0;
+  private fpsLowStreak = 0;
+  private fpsHighStreak = 0;
+  private dprCap = 2;
+  private dprCurrent = 2;
+
+  // --- pinch zoom ---
+  private touches = new Map<number, { x: number; y: number }>();
+  private pinchDist = 0;
+
+  // --- gyro parallax + drowsy idle ---
+  private gyro = { x: 0, y: 0, tx: 0, ty: 0 };
+  private drowsy = false;
+  private bloomTarget = 0.62;
+
+  // --- Catch the Thought (endless DOM-label game) ---
+  private thoughts: {
+    id: number;
+    phrase: string;
+    pos: THREE.Vector3;
+    vel: THREE.Vector3;
+    bornAt: number;
+    life: number;
+    phase: number;
+    el: HTMLElement | null;
+    caught: boolean;
+  }[] = [];
+  private thoughtActive = false;
+  private thoughtSpawnAt = 0;
+  private thoughtIdSeq = 0;
+  private thoughtScore = 0;
+  private thoughtCombo = 0;
+  private thoughtMisses = 0;
+  private thoughtBag: string[] = [];
+
+  /** "Mind seed" RNG — deterministic per day so the field differs day to day. */
+  private rand: () => number = Math.random;
+  private hueSeed = 0;
+
+  // --- generated artifacts riding the nodes (Mint models) ---
+  /** billboard artifacts tracked each frame; tumble artifacts ride the cage directly */
+  private billboards: { holder: THREE.Group; visual: NodeVisual; spin: number }[] =
+    [];
+  private loadedModels: THREE.Object3D[] = [];
+  private envRT: THREE.WebGLRenderTarget | null = null;
+
   constructor(
     private canvas: HTMLCanvasElement,
-    opts: { quality: "high" | "low"; reducedMotion: boolean; events: SceneEvents }
+    opts: {
+      quality: "high" | "low";
+      reducedMotion: boolean;
+      events: SceneEvents;
+      rand?: () => number;
+      hueSeed?: number;
+    }
   ) {
     this.events = opts.events;
     this.reducedMotion = opts.reducedMotion;
     this.timeScaleBase = opts.reducedMotion ? 0.35 : 1;
+    if (opts.rand) this.rand = opts.rand;
+    if (opts.hueSeed !== undefined) this.hueSeed = opts.hueSeed;
 
     this.renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: false,
       powerPreference: "high-performance",
     });
-    const dprCap = opts.quality === "high" ? 2 : 1.5;
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, dprCap));
+    this.dprCap = Math.min(
+      window.devicePixelRatio,
+      opts.quality === "high" ? 2 : 1.5
+    );
+    this.dprCurrent = this.dprCap;
+    this.renderer.setPixelRatio(this.dprCurrent);
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setClearColor(new THREE.Color("#030308"), 1);
+    canvas.style.touchAction = "none";
 
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(
@@ -147,6 +246,8 @@ export class MindScene {
     this.buildCore(count);
     this.buildDust(opts.quality === "high" ? 1600 : 700);
     this.buildNodes();
+    this.buildEnvironment();
+    this.buildArtifacts();
 
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(new RenderPass(this.scene, this.camera));
@@ -175,21 +276,29 @@ export class MindScene {
     return p;
   }
 
+  /** Uniform point on the unit sphere from our seeded RNG (Vector3.randomDirection, deseeded). */
+  private randomDirection(out: THREE.Vector3): THREE.Vector3 {
+    const theta = this.rand() * Math.PI * 2;
+    const z = this.rand() * 2 - 1;
+    const r = Math.sqrt(1 - z * z);
+    return out.set(r * Math.cos(theta), r * Math.sin(theta), z);
+  }
+
   private buildCore(count: number) {
     const positions = new Float32Array(count * 3);
     const seeds = new Float32Array(count);
     const v = new THREE.Vector3();
     for (let i = 0; i < count; i++) {
       // Oblate nebula ball with a sparse outer halo.
-      const halo = Math.random() < 0.14;
+      const halo = this.rand() < 0.14;
       const rMax = halo ? 5.4 : 2.9;
-      const r = Math.pow(Math.random(), halo ? 0.5 : 0.62) * rMax;
-      v.randomDirection().multiplyScalar(r);
+      const r = Math.pow(this.rand(), halo ? 0.5 : 0.62) * rMax;
+      this.randomDirection(v).multiplyScalar(r);
       v.y *= 0.72;
       positions[i * 3] = v.x;
       positions[i * 3 + 1] = v.y;
       positions[i * 3 + 2] = v.z;
-      seeds[i] = Math.random();
+      seeds[i] = this.rand();
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -213,7 +322,9 @@ export class MindScene {
         uForce: { value: 1 },
         uShockPos: { value: this.shockPos },
         uShockAge: { value: -1 },
-        uHueShift: { value: 0 },
+        uWellPos: { value: this.wellPosUniform },
+        uWellStrength: { value: this.wellStrengthUniform },
+        uHueShift: { value: this.hueSeed },
         uMono: { value: 0 },
       },
     });
@@ -234,11 +345,11 @@ export class MindScene {
     const seeds = new Float32Array(count);
     const v = new THREE.Vector3();
     for (let i = 0; i < count; i++) {
-      v.randomDirection().multiplyScalar(13 + Math.random() * 26);
+      this.randomDirection(v).multiplyScalar(13 + this.rand() * 26);
       positions[i * 3] = v.x;
       positions[i * 3 + 1] = v.y;
       positions[i * 3 + 2] = v.z;
-      seeds[i] = Math.random();
+      seeds[i] = this.rand();
     }
     const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
@@ -362,6 +473,142 @@ export class MindScene {
     }
   }
 
+  /**
+   * The node artifacts are PBR metal — pure metal is pure reflection, so with no
+   * lights and no environment they render black. Bake a tiny neutral equirect
+   * gradient (cool key + warm fill) into a PMREM so metals catch highlights while
+   * each model's own baked accent still reads. Only the artifacts use a standard
+   * material; particles are shader/basic and ignore this.
+   */
+  private buildEnvironment() {
+    const c = document.createElement("canvas");
+    c.width = 256;
+    c.height = 128;
+    const ctx = c.getContext("2d")!;
+    ctx.fillStyle = "#05060a";
+    ctx.fillRect(0, 0, 256, 128);
+    // cool key highlight, upper-left
+    let g = ctx.createRadialGradient(70, 34, 3, 70, 34, 78);
+    g.addColorStop(0, "#c6cffb");
+    g.addColorStop(0.45, "#4b568c");
+    g.addColorStop(1, "rgba(5,6,10,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 128);
+    // dim neutral warm fill, right side — gives metal a second reflection
+    // without forcing a hue onto the differently-accented nodes
+    g = ctx.createRadialGradient(198, 82, 3, 198, 82, 104);
+    g.addColorStop(0, "#7d7a68");
+    g.addColorStop(0.5, "#3a352c");
+    g.addColorStop(1, "rgba(5,6,10,0)");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, 256, 128);
+
+    const tex = new THREE.CanvasTexture(c);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    tex.colorSpace = THREE.SRGBColorSpace;
+    const pmrem = new THREE.PMREMGenerator(this.renderer);
+    this.envRT = pmrem.fromEquirectangular(tex);
+    this.scene.environment = this.envRT.texture;
+    tex.dispose();
+    pmrem.dispose();
+  }
+
+  /**
+   * Load one generated artifact per node and seat it inside that node's cage.
+   * The Cogniflow iris is a flat disc, so it billboards to the camera and spins
+   * on its own Z (parenting it to the tumbling cage would turn it edge-on and
+   * make it vanish). The volumetric artifacts simply ride the cage, inheriting
+   * its position tracking and X/Y tumble for free.
+   */
+  private buildArtifacts() {
+    const table = [
+      { id: "cogniflow", file: "cogniflow-iris", motion: "billboard", fit: 1.18, glow: false },
+      { id: "philosophy", file: "philosophy-keystone", motion: "tumble", fit: 1.15, glow: true },
+      { id: "arsenal", file: "arsenal-cluster", motion: "tumble", fit: 1.15, glow: true },
+      { id: "lab", file: "lab-capsule", motion: "tumble", fit: 1.15, glow: true },
+      { id: "signal", file: "signal-beacon", motion: "tumble", fit: 1.15, glow: true },
+    ] as const;
+    // ponytail: shipped GLBs are repacked derivatives with extensionsRequired:[]
+    // (no draco/meshopt/ktx2), so a bare GLTFLoader is sufficient. If a raw
+    // Mint-optimized GLB is ever swapped in, attach a DRACOLoader here.
+    const loader = new GLTFLoader();
+    for (const cfg of table) {
+      const visual = this.visuals.find((v) => v.node.id === cfg.id);
+      if (!visual) continue;
+      loader.load(
+        `/models/${cfg.file}.glb`,
+        (gltf) => {
+          const model = gltf.scene;
+          if (this.disposed) {
+            this.disposeObject(model);
+            return;
+          }
+          // fit the model's bounding sphere just proud of the wireframe cage,
+          // then recenter it so the cage and the model share an origin
+          const box = new THREE.Box3().setFromObject(model);
+          const sphere = box.getBoundingSphere(new THREE.Sphere());
+          const cageR = 0.52 * visual.node.scale;
+          const s = (cageR * cfg.fit) / sphere.radius;
+          model.scale.setScalar(s);
+          model.position.copy(sphere.center).multiplyScalar(-s);
+          this.loadedModels.push(model);
+
+          // These artifacts bake their accent glow into baseColor, not an
+          // emissive map, so in this near-unlit scene the bright seams would
+          // render dark. Reuse the delivered baseColor as an emissive source at
+          // low intensity: dark metal stays dark, only the bright accent lines
+          // self-illuminate and cross the bloom threshold. No map is altered.
+          if (cfg.glow) {
+            model.traverse((o) => {
+              const mat = (o as THREE.Mesh).material as
+                | THREE.MeshStandardMaterial
+                | undefined;
+              if (mat && mat.isMeshStandardMaterial && mat.map) {
+                mat.emissiveMap = mat.map;
+                mat.emissive = new THREE.Color(0xffffff);
+                mat.emissiveIntensity = 0.55;
+                mat.needsUpdate = true;
+              }
+            });
+          }
+
+          if (cfg.motion === "tumble") {
+            visual.icosa.add(model);
+          } else {
+            const holder = new THREE.Group();
+            holder.add(model);
+            holder.position.copy(visual.glow.position);
+            this.scene.add(holder);
+            this.billboards.push({
+              holder,
+              visual,
+              spin: this.rand() * Math.PI * 2,
+            });
+          }
+        },
+        undefined,
+        (err) => console.error(`[MindScene] ${cfg.file} load failed`, err)
+      );
+    }
+  }
+
+  /** Recursively dispose a loaded model's geometry, materials, and textures. */
+  private disposeObject(obj: THREE.Object3D) {
+    obj.traverse((o) => {
+      const mesh = o as THREE.Mesh;
+      if (mesh.geometry) mesh.geometry.dispose();
+      const mat = mesh.material as THREE.Material | THREE.Material[] | undefined;
+      if (!mat) return;
+      for (const m of Array.isArray(mat) ? mat : [mat]) {
+        for (const k in m) {
+          const val = (m as unknown as Record<string, unknown>)[k];
+          if (val instanceof THREE.Texture) val.dispose();
+        }
+        m.dispose();
+      }
+    });
+  }
+
   private buildTourPath() {
     const s = this.distScale;
     const camPts: THREE.Vector3[] = [new THREE.Vector3(0, 1.2 * s, 26 * s)];
@@ -394,46 +641,47 @@ export class MindScene {
 
   // ------------------------------------------------------------ interaction
 
+  private zoomBy(delta: number) {
+    this.spherical.radius = THREE.MathUtils.clamp(
+      this.spherical.radius + delta,
+      9,
+      34 * this.distScale
+    );
+    if (this.spherical.radius <= 9.01) this.emitSignal("zoom-min");
+  }
+
   private bindPointer() {
     const el = this.canvas;
     el.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "touch") {
+        this.touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        if (this.touches.size === 2) {
+          const [a, b] = [...this.touches.values()];
+          this.pinchDist = Math.hypot(a.x - b.x, a.y - b.y);
+          this.dragging = false; // two fingers = zoom, not orbit
+          return;
+        }
+      }
       if (this.mode !== "free") return;
       this.dragging = true;
       this.dragMoved = 0;
       this.lastPointer = { x: e.clientX, y: e.clientY };
       el.setPointerCapture(e.pointerId);
     });
-    window.addEventListener("pointermove", (e) => {
-      this.pointerNdc.set(
-        (e.clientX / window.innerWidth) * 2 - 1,
-        -(e.clientY / window.innerHeight) * 2 + 1
-      );
-      this.mouseActive = 1;
-      if (this.dragging && this.mode === "free") {
-        const dx = e.clientX - this.lastPointer.x;
-        const dy = e.clientY - this.lastPointer.y;
-        this.dragMoved += Math.abs(dx) + Math.abs(dy);
-        this.lastPointer = { x: e.clientX, y: e.clientY };
-        this.orbitVel.theta = -dx * 0.0035;
-        this.orbitVel.phi = -dy * 0.0028;
-      }
-    });
-    const endDrag = () => {
+    window.addEventListener("pointermove", (e) => this.onPointerMove(e));
+    const endDrag = (e?: PointerEvent) => {
       this.dragging = false;
+      if (e && e.pointerType === "touch") {
+        this.touches.delete(e.pointerId);
+        if (this.touches.size < 2) this.pinchDist = 0;
+      }
     };
     window.addEventListener("pointerup", (e) => {
       const wasTap = this.dragging && this.dragMoved < 6;
-      endDrag();
-      if (this.mode === "free" && wasTap && e.target === el) {
-        this.pointerNdc.set(
-          (e.clientX / window.innerWidth) * 2 - 1,
-          -(e.clientY / window.innerHeight) * 2 + 1
-        );
-        const hit = this.raycastNodes();
-        if (hit) this.events.onNodeClick(hit);
-      }
+      endDrag(e);
+      if (this.mode === "free" && wasTap && e.target === el) this.onCanvasTap(e);
     });
-    window.addEventListener("pointercancel", endDrag);
+    window.addEventListener("pointercancel", (e) => endDrag(e));
     document.documentElement.addEventListener("pointerleave", () => {
       this.mouseActive = 0;
     });
@@ -442,12 +690,7 @@ export class MindScene {
       (e) => {
         if (this.mode !== "free") return;
         e.preventDefault();
-        this.spherical.radius = THREE.MathUtils.clamp(
-          this.spherical.radius + e.deltaY * 0.012,
-          9,
-          34 * this.distScale
-        );
-        if (this.spherical.radius <= 9.01) this.emitSignal("zoom-min");
+        this.zoomBy(e.deltaY * 0.012);
       },
       { passive: false }
     );
@@ -458,6 +701,47 @@ export class MindScene {
         -(e.clientY / window.innerHeight) * 2 + 1
       );
     });
+  }
+
+  /** A clean tap on empty canvas: catch a mote, open a node, or drop a well. */
+  private onCanvasTap(e: PointerEvent) {
+    this.pointerNdc.set(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -(e.clientY / window.innerHeight) * 2 + 1
+    );
+    if (this.restoreActive) {
+      this.tryCatchMote();
+      return;
+    }
+    const hit = this.raycastNodes();
+    if (hit) this.events.onNodeClick(hit);
+    else this.dropWell();
+  }
+
+  private onPointerMove(e: PointerEvent) {
+    this.pointerNdc.set(
+      (e.clientX / window.innerWidth) * 2 - 1,
+      -(e.clientY / window.innerHeight) * 2 + 1
+    );
+    this.mouseActive = 1;
+    if (e.pointerType === "touch" && this.touches.has(e.pointerId)) {
+      this.touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (this.touches.size === 2 && this.mode === "free") {
+        const [a, b] = [...this.touches.values()];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (this.pinchDist > 0) this.zoomBy((this.pinchDist - dist) * 0.035);
+        this.pinchDist = dist;
+        return;
+      }
+    }
+    if (this.dragging && this.mode === "free") {
+      const dx = e.clientX - this.lastPointer.x;
+      const dy = e.clientY - this.lastPointer.y;
+      this.dragMoved += Math.abs(dx) + Math.abs(dy);
+      this.lastPointer = { x: e.clientX, y: e.clientY };
+      this.orbitVel.theta = -dx * 0.0035;
+      this.orbitVel.phi = -dy * 0.0028;
+    }
   }
 
   private emitSignal(s: SceneSignal) {
@@ -625,6 +909,22 @@ export class MindScene {
     this.emitSignal("shockwave");
   }
 
+  /** Click-to-place gravity well (empty-space tap in free-roam). Fades over ~9s. */
+  dropWell(ndcX?: number, ndcY?: number) {
+    const ndc = new THREE.Vector2(
+      ndcX ?? this.pointerNdc.x,
+      ndcY ?? this.pointerNdc.y
+    );
+    this.raycaster.setFromCamera(ndc, this.camera);
+    const ray = this.raycaster.ray;
+    const along = Math.max(-ray.origin.dot(ray.direction), 0);
+    const pos = ray.origin.clone().addScaledVector(ray.direction, along);
+    this.wells.push({ pos, bornAt: this.clock.elapsedTime });
+    if (this.wells.length > MindScene.MAX_WELLS) this.wells.shift();
+    this.emitSignal("well-drop");
+    return this.wells.length;
+  }
+
   /** Terminal toys — temporary alterations of the world. */
   exciteFor(seconds: number) {
     this.exciteUntil = this.clock.elapsedTime + seconds;
@@ -647,6 +947,295 @@ export class MindScene {
     this.coreMat.uniforms.uHueShift.value = v;
   }
 
+  /** Force-compile every shader while the preloader is still up. */
+  async warmup() {
+    try {
+      await this.renderer.compileAsync(this.scene, this.camera);
+    } catch {
+      // compilation happens lazily on first render anyway — never block boot
+    }
+  }
+
+  // ---------------------------------------------------- idle & device input
+
+  /** Whisper mode: the mind falls asleep when the visitor goes idle. */
+  setDrowsy(on: boolean) {
+    this.drowsy = on;
+    this.bloomTarget = on ? 0.3 : 0.62;
+  }
+
+  /** Gyroscope parallax for touch devices (no-op where unsupported). */
+  enableGyro() {
+    window.addEventListener("deviceorientation", (e) => {
+      if (e.gamma === null || e.beta === null) return;
+      this.gyro.tx = THREE.MathUtils.clamp(e.gamma / 45, -1, 1) * 1.4;
+      this.gyro.ty = THREE.MathUtils.clamp((e.beta - 45) / 45, -1, 1) * 1.0;
+    });
+  }
+
+  // -------------------------------------------------- Restore the Mind game
+
+  /** Spawns catchable "lost thought" motes ejected from the core. */
+  startRestoreGame(count = 12, seconds = 24) {
+    this.clearMotes();
+    this.restoreCaught = 0;
+    this.restoreTotal = count;
+    this.restoreStartedAt = this.clock.elapsedTime;
+    this.restoreEndsAt = this.clock.elapsedTime + seconds;
+    this.restoreActive = true;
+
+    const accent = new THREE.Color("#ffd98a");
+    for (let i = 0; i < count; i++) {
+      const dir = new THREE.Vector3();
+      this.randomDirection(dir);
+      const pos = dir.clone().multiplyScalar(1.2 + this.rand() * 0.8);
+      const vel = dir.clone().multiplyScalar(2.6 + this.rand() * 2.2);
+
+      const mat = new THREE.ShaderMaterial({
+        vertexShader: glowVertex,
+        fragmentShader: glowFragment,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        uniforms: {
+          uAccent: { value: accent },
+          uTime: { value: 0 },
+          uHover: { value: 0.55 },
+          uSeed: { value: this.rand() * 40 },
+          uScale: { value: 0.34 },
+        },
+      });
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat);
+      mesh.position.copy(pos);
+      mesh.frustumCulled = false;
+      this.scene.add(mesh);
+
+      const hit = new THREE.Mesh(
+        new THREE.SphereGeometry(0.85, 8, 8),
+        new THREE.MeshBasicMaterial({ visible: false })
+      );
+      hit.position.copy(pos);
+      hit.userData.moteId = this.moteIdSeq;
+      this.scene.add(hit);
+
+      this.motes.push({
+        id: this.moteIdSeq++,
+        mesh,
+        mat,
+        hit,
+        pos,
+        vel,
+        phase: this.rand() * 100,
+        caught: false,
+        caughtAt: -1,
+      });
+    }
+  }
+
+  private clearMotes() {
+    for (const m of this.motes) {
+      this.scene.remove(m.mesh, m.hit);
+      m.mat.dispose();
+      m.mesh.geometry.dispose();
+      (m.hit.material as THREE.Material).dispose();
+      m.hit.geometry.dispose();
+    }
+    this.motes = [];
+  }
+
+  private endRestoreGame() {
+    if (!this.restoreActive) return;
+    this.restoreActive = false;
+    this.events.onRestoreEnd({
+      caught: this.restoreCaught,
+      total: this.restoreTotal,
+      ms: Math.round((this.clock.elapsedTime - this.restoreStartedAt) * 1000),
+    });
+    // let uncaught motes drift and fade rather than vanish abruptly
+    window.setTimeout(() => this.clearMotes(), 1400);
+  }
+
+  private tryCatchMote(): boolean {
+    if (!this.restoreActive) return false;
+    this.raycaster.setFromCamera(this.pointerNdc, this.camera);
+    const hits = this.raycaster.intersectObjects(
+      this.motes.filter((m) => !m.caught).map((m) => m.hit),
+      false
+    );
+    if (!hits.length) return false;
+    const id = hits[0].object.userData.moteId as number;
+    const mote = this.motes.find((m) => m.id === id);
+    if (!mote || mote.caught) return false;
+    mote.caught = true;
+    mote.caughtAt = this.clock.elapsedTime;
+    this.restoreCaught++;
+    this.events.onRestoreTick(
+      this.restoreCaught,
+      this.restoreTotal,
+      Math.max(0, (this.restoreEndsAt - this.clock.elapsedTime) * 1000)
+    );
+    if (this.restoreCaught >= this.restoreTotal) this.endRestoreGame();
+    return true;
+  }
+
+  private updateRestoreGame(dt: number, t: number) {
+    if (this.restoreActive && t >= this.restoreEndsAt) {
+      this.endRestoreGame();
+    } else if (this.restoreActive) {
+      this.events.onRestoreTick(
+        this.restoreCaught,
+        this.restoreTotal,
+        Math.max(0, (this.restoreEndsAt - t) * 1000)
+      );
+    }
+
+    for (const m of this.motes) {
+      if (m.caught) {
+        // fly back into the core and shrink away
+        const age = t - m.caughtAt;
+        const k = Math.min(age / 0.45, 1);
+        m.pos.lerp(new THREE.Vector3(0, 0, 0), 0.16);
+        m.mesh.position.copy(m.pos);
+        m.mat.uniforms.uScale.value = 0.34 * (1 - k);
+        m.mat.uniforms.uTime.value = t;
+        if (k >= 1) m.mat.uniforms.uScale.value = 0;
+        continue;
+      }
+      // gentle wander + soft containment so motes stay in play
+      const r = m.pos.length();
+      const containment = r > 5.5 ? (r - 5.5) * 0.9 : 0;
+      m.vel.addScaledVector(m.pos, containment > 0 ? (-containment / r) * dt : 0);
+      m.vel.multiplyScalar(1 - Math.min(dt * 0.6, 0.9));
+      m.vel.x += Math.sin(t * 0.7 + m.phase) * 0.35 * dt;
+      m.vel.y += Math.cos(t * 0.5 + m.phase * 1.3) * 0.35 * dt;
+      m.vel.z += Math.sin(t * 0.6 + m.phase * 0.8) * 0.35 * dt;
+      m.pos.addScaledVector(m.vel, dt);
+      m.mesh.position.copy(m.pos);
+      m.hit.position.copy(m.pos);
+      m.mat.uniforms.uTime.value = t;
+    }
+  }
+
+  // -------------------------------------------------- Catch the Thought game
+
+  private nextPhrase(): string {
+    if (!this.thoughtBag.length) {
+      this.thoughtBag = [...thoughtFragments];
+      // shuffle (seeded) so it never plays the same order twice in a row
+      for (let i = this.thoughtBag.length - 1; i > 0; i--) {
+        const j = Math.floor(this.rand() * (i + 1));
+        [this.thoughtBag[i], this.thoughtBag[j]] = [this.thoughtBag[j], this.thoughtBag[i]];
+      }
+    }
+    return this.thoughtBag.pop()!;
+  }
+
+  startThoughtGame() {
+    this.stopThoughtGame();
+    this.thoughtActive = true;
+    this.thoughtScore = 0;
+    this.thoughtCombo = 0;
+    this.thoughtMisses = 0;
+    this.thoughtSpawnAt = this.clock.elapsedTime + 0.4;
+  }
+
+  stopThoughtGame() {
+    this.thoughtActive = false;
+    for (const th of this.thoughts) this.events.onThoughtGone(th.id, false);
+    this.thoughts = [];
+  }
+
+  registerThoughtLabel(id: number, el: HTMLElement | null) {
+    const th = this.thoughts.find((t) => t.id === id);
+    if (th) th.el = el;
+  }
+
+  catchThought(id: number): boolean {
+    const th = this.thoughts.find((t) => t.id === id);
+    if (!th || th.caught) return false;
+    th.caught = true;
+    this.thoughtScore++;
+    this.thoughtCombo++;
+    this.events.onThoughtScore(this.thoughtScore, this.thoughtCombo, this.thoughtMisses);
+    window.setTimeout(() => {
+      this.thoughts = this.thoughts.filter((t) => t.id !== id);
+      this.events.onThoughtGone(id, true);
+    }, 220);
+    return true;
+  }
+
+  private spawnThought(t: number) {
+    const dir = new THREE.Vector3();
+    this.randomDirection(dir);
+    const pos = dir.clone().multiplyScalar(1.5 + this.rand() * 1.8);
+    const vel = dir.clone().multiplyScalar(0.5 + this.rand() * 0.5);
+    // difficulty ramps with score: shorter life, tighter spacing, floor out
+    const lifeBase = Math.max(2.6, 5.2 - this.thoughtScore * 0.09);
+    const id = this.thoughtIdSeq++;
+    this.thoughts.push({
+      id,
+      phrase: this.nextPhrase(),
+      pos,
+      vel,
+      bornAt: t,
+      life: lifeBase + this.rand() * 1.2,
+      phase: this.rand() * 100,
+      el: null,
+      caught: false,
+    });
+    this.events.onThoughtSpawn(id, this.thoughts[this.thoughts.length - 1].phrase);
+    const interval = Math.max(0.85, 1.9 - this.thoughtScore * 0.035);
+    this.thoughtSpawnAt = t + interval * (0.75 + this.rand() * 0.5);
+  }
+
+  private updateThoughtGame(dt: number, t: number) {
+    if (this.thoughtActive && t >= this.thoughtSpawnAt) this.spawnThought(t);
+
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const proj = new THREE.Vector3();
+    for (const th of [...this.thoughts]) {
+      if (th.caught) {
+        if (th.el) {
+          th.el.style.opacity = "1";
+          th.el.classList.add("caught");
+        }
+        continue;
+      }
+      const age = t - th.bornAt;
+      if (this.thoughtActive && age > th.life) {
+        this.thoughts = this.thoughts.filter((x) => x.id !== th.id);
+        this.thoughtCombo = 0;
+        this.thoughtMisses++;
+        this.events.onThoughtGone(th.id, false);
+        this.events.onThoughtScore(this.thoughtScore, this.thoughtCombo, this.thoughtMisses);
+        if (this.thoughtMisses >= 3) {
+          this.thoughtActive = false;
+          this.events.onThoughtGameOver(this.thoughtScore);
+          window.setTimeout(() => this.stopThoughtGame(), 50);
+        }
+        continue;
+      }
+
+      th.vel.x += Math.sin(t * 0.6 + th.phase) * 0.25 * dt;
+      th.vel.y += Math.cos(t * 0.45 + th.phase * 1.4) * 0.25 * dt;
+      th.vel.z += Math.sin(t * 0.5 + th.phase * 0.7) * 0.25 * dt;
+      th.vel.multiplyScalar(1 - Math.min(dt * 0.5, 0.9));
+      th.pos.addScaledVector(th.vel, dt);
+
+      if (!th.el) continue;
+      proj.copy(th.pos).project(this.camera);
+      const behind = proj.z > 1;
+      const x = (proj.x * 0.5 + 0.5) * w;
+      const y = (-proj.y * 0.5 + 0.5) * h;
+      th.el.style.transform = `translate(-50%, -50%) translate(${x.toFixed(1)}px, ${y.toFixed(1)}px)`;
+      const fadeIn = Math.min(age / 0.35, 1);
+      const fadeOut = 1 - Math.max(0, (age - (th.life - 0.8)) / 0.8);
+      th.el.style.opacity = behind ? "0" : Math.min(fadeIn, fadeOut).toFixed(3);
+      th.el.style.pointerEvents = behind ? "none" : "auto";
+    }
+  }
+
   resize() {
     const w = window.innerWidth;
     const h = window.innerHeight;
@@ -660,16 +1249,57 @@ export class MindScene {
   dispose() {
     this.disposed = true;
     cancelAnimationFrame(this.raf);
+    this.clearMotes();
+    this.stopThoughtGame();
+    for (const m of this.loadedModels) this.disposeObject(m);
+    this.envRT?.dispose();
     this.renderer.dispose();
   }
 
   // ------------------------------------------------------------------ loop
+
+  /** Adaptive quality: trade pixel ratio for frame rate, both directions. */
+  private updateQuality(dt: number) {
+    this.fpsFrames++;
+    this.fpsAcc += dt;
+    if (this.fpsAcc < 1) return;
+    const fps = this.fpsFrames / this.fpsAcc;
+    this.fpsFrames = 0;
+    this.fpsAcc = 0;
+    if (fps < 45) {
+      this.fpsLowStreak++;
+      this.fpsHighStreak = 0;
+    } else if (fps > 57) {
+      this.fpsHighStreak++;
+      this.fpsLowStreak = 0;
+    } else {
+      this.fpsLowStreak = 0;
+      this.fpsHighStreak = 0;
+    }
+    if (this.fpsLowStreak >= 3 && this.dprCurrent > 0.75) {
+      this.dprCurrent = Math.max(0.75, this.dprCurrent * 0.85);
+      this.applyPixelRatio();
+      this.fpsLowStreak = 0;
+    } else if (this.fpsHighStreak >= 8 && this.dprCurrent < this.dprCap) {
+      this.dprCurrent = Math.min(this.dprCap, this.dprCurrent * 1.12);
+      this.applyPixelRatio();
+      this.fpsHighStreak = 0;
+    }
+  }
+
+  private applyPixelRatio() {
+    this.renderer.setPixelRatio(this.dprCurrent);
+    this.composer.setSize(window.innerWidth, window.innerHeight);
+    this.coreMat.uniforms.uPixelRatio.value = this.dprCurrent;
+    this.dustMat.uniforms.uPixelRatio.value = this.dprCurrent;
+  }
 
   private loop = () => {
     if (this.disposed) return;
     this.raf = requestAnimationFrame(this.loop);
     const dt = Math.min(this.clock.getDelta(), 0.05);
     const t = this.clock.elapsedTime;
+    this.updateQuality(dt);
 
     // -- uniforms shared by everything
     this.coreMat.uniforms.uTime.value = t;
@@ -683,10 +1313,34 @@ export class MindScene {
     );
     this.coreMat.uniforms.uTimeScale.value = THREE.MathUtils.lerp(
       this.coreMat.uniforms.uTimeScale.value,
-      this.calmed ? 0.1 : this.timeScaleBase,
+      this.calmed || this.drowsy ? 0.1 : this.timeScaleBase,
       0.04
     );
     this.dustMat.uniforms.uTime.value = t;
+    this.bloom.strength += (this.bloomTarget - this.bloom.strength) * 0.03;
+
+    // -- Restore the Mind game (no-op unless active or resolving)
+    if (this.restoreActive || this.motes.length) this.updateRestoreGame(dt, t);
+
+    // -- Catch the Thought game (no-op unless active or resolving)
+    if (this.thoughtActive || this.thoughts.length) this.updateThoughtGame(dt, t);
+
+    // -- dropped gravity wells: decay strength, drop expired ones, sync uniforms
+    if (this.wells.length) {
+      this.wells = this.wells.filter((w) => t - w.bornAt < MindScene.WELL_LIFE);
+    }
+    for (let i = 0; i < MindScene.MAX_WELLS; i++) {
+      const w = this.wells[i];
+      if (w) {
+        const age = t - w.bornAt;
+        this.wellPosUniform[i].copy(w.pos);
+        this.wellStrengthUniform[i] =
+          Math.sin(Math.min(age / 0.6, 1) * Math.PI * 0.5) *
+          Math.exp(-age / (MindScene.WELL_LIFE * 0.45));
+      } else {
+        this.wellStrengthUniform[i] = 0;
+      }
+    }
 
     // -- pointer -> world (closest point on the pointer ray to the core)
     this.raycaster.setFromCamera(this.pointerNdc, this.camera);
@@ -756,6 +1410,15 @@ export class MindScene {
       v.icosa.rotation.y += dt * (0.22 + v.hoverT * 1.2);
     }
 
+    // -- billboard artifacts (the iris): follow the node, face the camera,
+    // spin on their own axis; tumble artifacts ride the cage and need nothing here
+    for (const b of this.billboards) {
+      b.holder.position.copy(b.visual.glow.position);
+      b.spin += dt * (0.5 + b.visual.hoverT * 2.2);
+      b.holder.quaternion.copy(this.camera.quaternion);
+      b.holder.rotateZ(b.spin);
+    }
+
     // -- camera per mode
     if (this.mode === "tour") {
       this.tourCurrent = THREE.MathUtils.lerp(this.tourCurrent, this.tourTarget, 0.07);
@@ -774,6 +1437,11 @@ export class MindScene {
       this.orbitVel.phi *= 0.92;
       if (!this.dragging && !this.reducedMotion) this.spherical.theta += dt * 0.03; // idle drift
       this.camera.position.setFromSpherical(this.spherical);
+      // gyroscope parallax (touch devices): tilt shifts the viewpoint slightly
+      this.gyro.x = THREE.MathUtils.lerp(this.gyro.x, this.gyro.tx, 0.05);
+      this.gyro.y = THREE.MathUtils.lerp(this.gyro.y, this.gyro.ty, 0.05);
+      this.camera.position.x += this.gyro.x;
+      this.camera.position.y += this.gyro.y;
       this.desiredTarget.set(0, 0, 0);
     }
     // "boot" and "focus": GSAP owns camera.position / desiredTarget.

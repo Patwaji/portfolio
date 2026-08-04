@@ -11,6 +11,8 @@ import {
   colophon,
 } from "../lib/data";
 import type { MindNode } from "../lib/data";
+import { mindAudio } from "../lib/audio";
+import { Chars } from "./Chars";
 
 export function NodePanel({
   nodeId,
@@ -32,6 +34,7 @@ export function NodePanel({
   useLayoutEffect(() => {
     const panel = panelRef.current!;
     const items = panel.querySelectorAll("[data-anim]");
+    mindAudio.whoosh(true);
     gsap.fromTo(
       panel,
       mobile ? { yPercent: 100 } : { xPercent: 100 },
@@ -50,6 +53,7 @@ export function NodePanel({
     if (closing.current) return;
     closing.current = true;
     onCloseStart();
+    mindAudio.whoosh(false);
     gsap.to(scrimRef.current, { opacity: 0, duration: 0.5 });
     gsap.to(panelRef.current, {
       ...(mobile ? { yPercent: 100 } : { xPercent: 100 }),
@@ -101,7 +105,7 @@ function PanelBody({
     case "philosophy":
       return (
         <>
-          <h2 data-anim>{philosophy.heading}</h2>
+          <h2 data-anim className="kinetic-run"><Chars text={philosophy.heading} /></h2>
           <div className="p-section" data-anim>
             THE METHOD
           </div>
@@ -111,13 +115,24 @@ function PanelBody({
           <blockquote className="p-quote aurora-text" data-anim>
             {philosophy.pullQuote}
           </blockquote>
+          <div className="p-section" data-anim>
+            {philosophy.originHeading}
+          </div>
+          {philosophy.originParagraphs.map((p, i) => (
+            <p className="p-body" data-anim key={i}>
+              {p}
+            </p>
+          ))}
+          <blockquote className="p-quote aurora-text" data-anim>
+            {philosophy.originQuote}
+          </blockquote>
         </>
       );
 
     case "arsenal":
       return (
         <>
-          <h2 data-anim>{arsenal.heading}</h2>
+          <h2 data-anim className="kinetic-run"><Chars text={arsenal.heading} /></h2>
           <p className="p-body" data-anim>
             {arsenal.sub}
           </p>
@@ -140,7 +155,7 @@ function PanelBody({
           <div className="p-status" data-anim>
             {cogniflow.status}
           </div>
-          <h2 data-anim>Cogniflow</h2>
+          <h2 data-anim className="kinetic-run"><Chars text="Cogniflow" /></h2>
           <p className="p-oneliner" data-anim>
             {cogniflow.oneLiner}
           </p>
@@ -183,7 +198,7 @@ function PanelBody({
     case "lab":
       return (
         <>
-          <h2 data-anim>{lab.heading}</h2>
+          <h2 data-anim className="kinetic-run"><Chars text={lab.heading} /></h2>
           <p className="p-body" data-anim>
             {lab.body}
           </p>
@@ -205,7 +220,7 @@ function PanelBody({
     case "signal":
       return (
         <>
-          <h2 data-anim>{signal.heading}</h2>
+          <h2 data-anim className="kinetic-run"><Chars text={signal.heading} /></h2>
           <p className="p-body" data-anim>
             {signal.sub}
           </p>

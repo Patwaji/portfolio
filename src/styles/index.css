@@ -114,14 +114,55 @@ a { color: inherit; }
   to { background-position: 100% 50%; }
 }
 
+/* ————————————————————————————————————————————— kinetic type */
+
+.chars .ch {
+  display: inline-block;
+  opacity: 0;
+}
+
+.kinetic-run .ch {
+  animation: ch-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--i) * 24ms);
+}
+
+@keyframes ch-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.55em) rotate(4deg);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0deg);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chars .ch { opacity: 1; animation: none !important; }
+}
+
 /* ————————————————————————————————————————————— preloader */
 
 .preloader {
   position: fixed; inset: 0; z-index: 9;
+  pointer-events: none;
+}
+
+.preloader .preloader-bg {
+  position: absolute; inset: 0;
   background: var(--bg);
+  transition: opacity 1.4s ease;
+}
+.preloader:not(.phase-loading) .preloader-bg { opacity: 0; }
+
+.preloader .preloader-ui {
+  position: absolute; inset: 0;
   display: flex; flex-direction: column;
   justify-content: center; align-items: center;
   gap: 3rem;
+  transition: opacity 0.6s ease;
 }
 
 .preloader .boot-log {
@@ -132,7 +173,10 @@ a { color: inherit; }
   width: min(420px, 84vw);
 }
 
-.preloader .boot-log .line { opacity: 0; }
+.preloader .boot-log .line {
+  opacity: 0;
+  transition: opacity 0.3s;
+}
 .preloader .boot-log .line em {
   font-style: normal;
   color: var(--accent);
@@ -160,7 +204,9 @@ a { color: inherit; }
   background: var(--aurora);
   transform-origin: left;
   transform: scaleX(0);
+  transition: transform 0.25s ease-out;
 }
+
 
 /* ————————————————————————————————————————————— HUD */
 
@@ -515,6 +561,34 @@ a { color: inherit; }
   text-transform: uppercase;
 }
 
+/* — fingerprint bars — */
+.fp-bars { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
+.fp-empty {
+  font-size: 11px;
+  color: var(--ink-faint);
+  padding: 6px 0;
+}
+.fp-bar-row {
+  display: grid;
+  grid-template-columns: 76px 1fr 42px;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+.fp-bar-track {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.fp-bar-fill {
+  height: 100%;
+  background: var(--aurora);
+}
+.fp-bar-value { text-align: right; color: var(--ink-faint); }
+
 /* — lab toy — */
 .destabilize {
   display: block;
@@ -698,6 +772,154 @@ a { color: inherit; }
   margin-top: 8px;
   color: var(--ink-faint);
 }
+
+/* ————————————————————————————————————————————— restore the mind */
+
+.restore-hud {
+  position: fixed;
+  top: 20px; left: 50%; z-index: 5;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.restore-title {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: #ffd98a;
+}
+
+.restore-bar {
+  width: min(320px, 70vw);
+  height: 2px;
+  background: var(--line);
+}
+.restore-bar i {
+  display: block; height: 100%;
+  background: #ffd98a;
+  transform-origin: left;
+  transition: transform 0.2s linear;
+}
+
+.restore-count {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.restore-count span { color: var(--ink-faint); font-size: 1rem; }
+
+.restore-hint {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+}
+
+.restore-results-scrim {
+  position: fixed; inset: 0; z-index: 9;
+  background: rgba(1, 1, 5, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.restore-results {
+  width: min(360px, 88vw);
+  padding: 40px 32px;
+  text-align: center;
+  background: rgba(6, 7, 16, 0.9);
+  border: 1px solid rgba(255, 217, 138, 0.35);
+  box-shadow: 0 0 50px rgba(255, 217, 138, 0.14);
+}
+
+.restore-results .kicker { color: #ffd98a; margin-bottom: 18px; }
+
+.restore-score {
+  font-family: var(--display);
+  font-size: 4rem;
+  font-weight: 600;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+.restore-score span { color: var(--ink-faint); font-size: 2rem; }
+
+.restore-meta {
+  font-size: 11px;
+  color: var(--ink-dim);
+  letter-spacing: 0.06em;
+  margin-bottom: 28px;
+}
+.restore-meta em { font-style: normal; color: #ffd98a; }
+
+.restore-results .hud-btn { width: 100%; justify-content: center; display: flex; }
+
+/* ————————————————————————————————————————————— catch the thought */
+
+.thought-label {
+  position: fixed; top: 0; left: 0; z-index: 2;
+  will-change: transform, opacity;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  color: var(--ink);
+  background: rgba(10, 10, 20, 0.45);
+  border: 1px solid rgba(157, 123, 255, 0.4);
+  padding: 7px 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+}
+.thought-label:hover {
+  transform: translate(-50%, -50%) scale(1.08) !important;
+  border-color: #9d7bff;
+  background: rgba(157, 123, 255, 0.16);
+}
+.thought-label.caught {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  transform: translate(-50%, -50%) scale(1.6) !important;
+  opacity: 0 !important;
+  border-color: #9d7bff;
+  color: #9d7bff;
+}
+
+.thought-hud {
+  position: fixed;
+  top: 20px; left: 50%; z-index: 5;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px;
+  pointer-events: none;
+}
+.thought-title {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  color: #9d7bff;
+}
+.thought-score {
+  font-family: var(--display);
+  font-size: 2rem;
+  font-weight: 600;
+  transition: transform 0.15s ease;
+}
+.thought-score.pulse { transform: scale(1.25); color: #9d7bff; }
+.thought-combo {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: #ffd98a;
+  text-transform: uppercase;
+}
+.thought-lives { display: flex; gap: 6px; margin-top: 2px; }
+.thought-lives i {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink-faint);
+  font-style: normal;
+}
+.thought-lives i.on { background: #9d7bff; }
+
+.thought-results .kicker { color: #9d7bff; }
+.thought-results { border-color: rgba(157, 123, 255, 0.35); box-shadow: 0 0 50px rgba(157, 123, 255, 0.16); }
+.thought-results .restore-meta em { color: #9d7bff; }
 
 /* ————————————————————————————————————————————— cursor */
 

@@ -75,6 +75,8 @@ uniform float uBurstAge;
 uniform float uForce;    // +1 repel (default) · negative = gravity mode
 uniform vec3 uShockPos;
 uniform float uShockAge; // seconds since last shockwave, -1 when idle
+uniform vec3 uWellPos[4];    // dropped gravity wells (terminal/click toy)
+uniform float uWellStrength[4]; // 0 = inactive, decays to 0 over its lifetime
 attribute float aSeed;
 varying float vColorT;
 varying float vAlpha;
@@ -120,6 +122,13 @@ void main(){
   float ring = exp(-pow(sd - uShockAge * 9.0, 2.0) * 0.55)
              * exp(-uShockAge * 1.4) * step(0.0, uShockAge);
   p += normalize(ds + 0.0001) * ring * 2.4;
+
+  // Dropped gravity wells — click-to-place, independent of the live cursor.
+  for (int i = 0; i < 4; i++) {
+    vec3 dw = p - uWellPos[i];
+    float wd2 = dot(dw, dw);
+    p += normalize(dw + 0.0001) * exp(-wd2 / 9.0) * -2.0 * uWellStrength[i];
+  }
 
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   gl_Position = projectionMatrix * mv;
