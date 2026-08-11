@@ -34,3 +34,5 @@ package-lock.json
 /blog-node.png
 /blog-node-fixed.png
 /mind-scene.png
+/*.png
+*.tsbuildinfo

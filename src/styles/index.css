@@ -561,6 +561,109 @@ a { color: inherit; }
   text-transform: uppercase;
 }
 
+/* — cogniflow live demo — */
+.cf-demo {
+  border: 1px solid var(--line);
+  padding: 18px;
+  margin: 26px 0;
+  background: rgba(255, 255, 255, 0.015);
+}
+.cf-head {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 9px; letter-spacing: 0.2em;
+  color: var(--ink-faint);
+  margin-bottom: 12px;
+}
+.cf-head .rec {
+  color: var(--panel-accent, var(--accent));
+  display: flex; align-items: center; gap: 6px;
+}
+.cf-head .rec::before {
+  content: ""; width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor; animation: blink 1.2s ease-in-out infinite;
+}
+.cf-stage {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--line);
+}
+.cf-video {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transform: scaleX(-1); /* mirror, natural selfie view */
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+.cf-video[data-live="1"] { opacity: 1; }
+.cf-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 16px; text-align: center; padding: 22px;
+}
+.cf-overlay p {
+  font-size: 12.5px; line-height: 1.6; color: var(--ink-dim);
+  max-width: 34ch; margin: 0;
+}
+.cf-overlay .cf-load { color: var(--ink-faint); letter-spacing: 0.04em; }
+.cf-btn {
+  font-family: var(--mono, var(--display));
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink);
+  padding: 11px 20px;
+  border: 1px solid var(--panel-accent, var(--accent));
+  background: color-mix(in srgb, var(--panel-accent, var(--accent)) 12%, transparent);
+  cursor: pointer;
+  transition: background 0.3s, color 0.3s;
+}
+.cf-btn:hover { background: var(--panel-accent, var(--accent)); color: #06060a; }
+.cf-readout {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-top: 16px;
+}
+.cf-state {
+  font-family: var(--display);
+  font-size: 2rem; font-weight: 600; line-height: 1;
+  color: var(--cf-state-color, var(--ink));
+}
+.cf-state[data-state="Focused"] { --cf-state-color: #4ff0d1; }
+.cf-state[data-state="Drifting"] { --cf-state-color: #ffc24d; }
+.cf-state[data-state="Drowsy"]   { --cf-state-color: #5fb8ff; }
+.cf-state[data-state="Away"]     { --cf-state-color: var(--ink-faint); }
+.cf-conf { text-align: right; }
+.cf-conf b {
+  display: block; font-family: var(--display); font-size: 1.4rem; font-weight: 600;
+  font-variant-numeric: tabular-nums; color: var(--ink);
+}
+.cf-conf i {
+  font-style: normal; font-size: 9px; letter-spacing: 0.16em;
+  color: var(--ink-faint); text-transform: uppercase;
+}
+.cf-signals {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line);
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--ink-faint);
+}
+.cf-signals span { display: inline-flex; align-items: center; gap: 7px; }
+.cf-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--ink-faint); opacity: 0.35;
+  transition: background 0.25s, opacity 0.25s;
+}
+.cf-dot[data-on="1"] { background: var(--panel-accent, var(--accent)); opacity: 1; }
+.cf-stop {
+  margin-top: 16px; width: 100%;
+  font-family: var(--mono, var(--display));
+  font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--ink-dim);
+  padding: 10px; border: 1px solid var(--line); background: transparent;
+  cursor: pointer; transition: color 0.3s, border-color 0.3s;
+}
+.cf-stop:hover { color: var(--ink); border-color: var(--ink-dim); }
+
 /* — fingerprint bars — */
 .fp-bars { display: flex; flex-direction: column; gap: 8px; margin-bottom: 4px; }
 .fp-empty {

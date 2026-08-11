@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { CSSProperties } from "react";
 import gsap from "gsap";
+import { CogniflowDemo } from "./CogniflowDemo";
 import {
   nodes,
   philosophy,
@@ -161,7 +162,7 @@ function PanelBody({
             {cogniflow.oneLiner}
           </p>
           <div data-anim>
-            <CogniflowInstrument />
+            <CogniflowDemo />
           </div>
           <div className="p-section" data-anim>
             ABSTRACT
@@ -291,96 +292,4 @@ function PanelBody({
         </>
       );
   }
-}
-
-/** Fake-live telemetry: a drawing waveform + drifting readouts. */
-const ATTENTION_STATES = ["Focused", "Focused", "Drifting", "Drowsy", "Away"] as const;
-
-function CogniflowInstrument() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [readouts, setReadouts] = useState({ state: "Focused", confidence: 88, onTask: 91 });
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      const state = ATTENTION_STATES[Math.floor(Math.random() * ATTENTION_STATES.length)];
-      const focused = state === "Focused";
-      setReadouts({
-        state,
-        confidence: (focused ? 82 : 64) + Math.round(Math.random() * 12),
-        onTask: (focused ? 84 : 40) + Math.round(Math.random() * 12),
-      });
-    }, 1400);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current!;
-    const ctx = canvas.getContext("2d")!;
-    let raf = 0;
-    const dpr = Math.min(window.devicePixelRatio, 2);
-
-    const resize = () => {
-      canvas.width = canvas.clientWidth * dpr;
-      canvas.height = canvas.clientHeight * dpr;
-    };
-    resize();
-
-    const draw = (now: number) => {
-      raf = requestAnimationFrame(draw);
-      const t = now / 1000;
-      const w = canvas.width;
-      const h = canvas.height;
-      ctx.clearRect(0, 0, w, h);
-
-      ctx.strokeStyle = "rgba(233,236,255,0.08)";
-      ctx.lineWidth = 1;
-      for (let gy = 1; gy < 4; gy++) {
-        ctx.beginPath();
-        ctx.moveTo(0, (h / 4) * gy);
-        ctx.lineTo(w, (h / 4) * gy);
-        ctx.stroke();
-      }
-
-      ctx.strokeStyle = "#ff5fd2";
-      ctx.lineWidth = 1.5 * dpr;
-      ctx.beginPath();
-      for (let x = 0; x <= w; x += 2) {
-        const u = x / w;
-        const y =
-          h / 2 +
-          Math.sin(t * 1.6 + u * 9) * h * 0.2 +
-          Math.sin(t * 3.7 + u * 23) * h * 0.09 +
-          Math.sin(t * 9.1 + u * 51) * h * 0.03;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-    };
-    raf = requestAnimationFrame(draw);
-    return () => cancelAnimationFrame(raf);
-  }, []);
-
-  return (
-    <div className="instrument">
-      <div className="inst-head">
-        <span>ATTENTION STATE — ILLUSTRATIVE</span>
-        <span className="rec">DEMO</span>
-      </div>
-      <canvas ref={canvasRef} />
-      <div className="readouts">
-        <div className="r">
-          <b>{readouts.state}</b>
-          <i>Current state</i>
-        </div>
-        <div className="r">
-          <b>{readouts.confidence}%</b>
-          <i>Confidence</i>
-        </div>
-        <div className="r">
-          <b>{readouts.onTask}%</b>
-          <i>On task</i>
-        </div>
-      </div>
-    </div>
-  );
 }
