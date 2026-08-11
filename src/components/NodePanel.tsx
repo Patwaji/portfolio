@@ -8,6 +8,7 @@ import {
   cogniflow,
   lab,
   signal,
+  blog,
   colophon,
 } from "../lib/data";
 import type { MindNode } from "../lib/data";
@@ -169,7 +170,7 @@ function PanelBody({
             {cogniflow.abstract}
           </p>
           <div className="p-section" data-anim>
-            SIGNALS TRACKED
+            WHAT IT READS
           </div>
           <ul className="p-list" data-anim>
             {cogniflow.method.map((m) => (
@@ -177,16 +178,29 @@ function PanelBody({
             ))}
           </ul>
           <div className="p-section" data-anim>
-            VALIDATED AGAINST
+            DELIBERATELY WON'T DO
           </div>
           <ul className="p-list" data-anim>
-            {cogniflow.validation.map((v) => (
+            {cogniflow.wontDo.map((v) => (
               <li key={v}>{v}</li>
             ))}
           </ul>
+          <div className="p-section" data-anim>
+            THE PAPER
+          </div>
+          <p className="p-body" data-anim>
+            {cogniflow.paper}
+          </p>
           <p className="p-body" data-anim style={{ marginTop: 22 }}>
             {cogniflow.closingLine}
           </p>
+          <div className="signal-links" data-anim style={{ marginTop: 18 }}>
+            {cogniflow.links.map((l) => (
+              <a key={l.label} href={l.href} target="_blank" rel="noreferrer">
+                {l.label}
+              </a>
+            ))}
+          </div>
           <div className="chips" data-anim>
             {cogniflow.tags.map((t) => (
               <span key={t}>{t}</span>
@@ -241,22 +255,61 @@ function PanelBody({
           </div>
         </>
       );
+
+    case "blog":
+      return (
+        <>
+          <h2 data-anim className="kinetic-run"><Chars text={blog.heading} /></h2>
+          <p className="p-body" data-anim>
+            {blog.sub}
+          </p>
+          <div className="p-section" data-anim>
+            LATEST
+          </div>
+          <div className="blog-list" data-anim>
+            {blog.posts.map((post) => (
+              <a
+                key={post.href}
+                className="blog-post"
+                href={post.href}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {post.title}
+              </a>
+            ))}
+          </div>
+          <a
+            className="signal-email aurora-text"
+            href={blog.href}
+            target="_blank"
+            rel="noreferrer"
+            data-anim
+          >
+            {blog.cta}
+          </a>
+        </>
+      );
   }
 }
 
 /** Fake-live telemetry: a drawing waveform + drifting readouts. */
+const ATTENTION_STATES = ["Focused", "Focused", "Drifting", "Drowsy", "Away"] as const;
+
 function CogniflowInstrument() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [readouts, setReadouts] = useState({ eng: 74, blink: 14, gaze: 82 });
+  const [readouts, setReadouts] = useState({ state: "Focused", confidence: 88, onTask: 91 });
 
   useEffect(() => {
     const id = setInterval(() => {
+      const state = ATTENTION_STATES[Math.floor(Math.random() * ATTENTION_STATES.length)];
+      const focused = state === "Focused";
       setReadouts({
-        eng: 68 + Math.round(Math.random() * 14),
-        blink: 12 + Math.round(Math.random() * 5),
-        gaze: 78 + Math.round(Math.random() * 10),
+        state,
+        confidence: (focused ? 82 : 64) + Math.round(Math.random() * 12),
+        onTask: (focused ? 84 : 40) + Math.round(Math.random() * 12),
       });
-    }, 1100);
+    }, 1400);
     return () => clearInterval(id);
   }, []);
 
@@ -310,22 +363,22 @@ function CogniflowInstrument() {
   return (
     <div className="instrument">
       <div className="inst-head">
-        <span>COGNITIVE TELEMETRY — SIMULATED FEED</span>
-        <span className="rec">LIVE</span>
+        <span>ATTENTION STATE — ILLUSTRATIVE</span>
+        <span className="rec">DEMO</span>
       </div>
       <canvas ref={canvasRef} />
       <div className="readouts">
         <div className="r">
-          <b>{readouts.eng}%</b>
-          <i>Engagement</i>
+          <b>{readouts.state}</b>
+          <i>Current state</i>
         </div>
         <div className="r">
-          <b>{readouts.blink}</b>
-          <i>Blinks / min</i>
+          <b>{readouts.confidence}%</b>
+          <i>Confidence</i>
         </div>
         <div className="r">
-          <b>{readouts.gaze}%</b>
-          <i>Gaze stability</i>
+          <b>{readouts.onTask}%</b>
+          <i>On task</i>
         </div>
       </div>
     </div>

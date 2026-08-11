@@ -3,30 +3,31 @@ export const profile = {
   initials: "SP",
   system: "SP//MIND",
   version: "v3.0",
-  eyebrow: "A THINKER. A BUILDER. NO FIXED STACK.",
+  eyebrow: "BUILDER. RESEARCHER. NO FIXED STACK.",
+  // the one place the signature line lives — used once, on purpose
   tagline: "I don't collect frameworks. I collect questions worth sitting with.",
 };
 
 /** Loose half-formed thoughts for the Catch the Thought minigame. */
 export const thoughtFragments = [
   "no fixed stack",
-  "worth sitting with",
-  "build first, ask later",
+  "build first, name it later",
   "most of this stays in the lab",
   "still not sure this works",
-  "the question, not the answer",
-  "i'll learn it when i need it",
-  "not for a job",
+  "i'll learn it when the problem needs it",
+  "not chasing a title",
   "a mind, not a resume",
-  "cogniflow, unfinished",
-  "hold a standard, not a title",
+  "cogniflow, still cooking",
+  "the camera only sees where you look",
   "curiosity over completion",
   "what if the stack doesn't matter",
-  "R&D, applied to a life",
+  "left college, kept building",
+  "R&D, pointed at a life",
+  "go on, poke it",
 ];
 
 export type MindNode = {
-  id: "philosophy" | "arsenal" | "cogniflow" | "lab" | "signal";
+  id: "philosophy" | "arsenal" | "cogniflow" | "lab" | "signal" | "blog";
   index: number;
   code: string;
   title: string;
@@ -44,7 +45,7 @@ export const nodes: MindNode[] = [
     index: 0,
     code: "N-01 · AXIOMS",
     title: "PHILOSOPHY",
-    blurb: "The operating principles. Why 'no fixed stack' is a method, not a mood.",
+    blurb: "Why 'no fixed stack' is a working method, not a mood.",
     position: [-7.6, 2.4, -3.2],
     accent: "#4ff0d1",
     scale: 1,
@@ -54,7 +55,7 @@ export const nodes: MindNode[] = [
     index: 1,
     code: "N-02 · TOOLKIT",
     title: "ARSENAL",
-    blurb: "Not a checklist — a toolbox. Picked up when a problem demanded it.",
+    blurb: "Not a checklist. A toolbox I pick from when a problem asks for it.",
     position: [6.9, -1.8, -5.2],
     accent: "#9d7bff",
     scale: 1,
@@ -64,7 +65,7 @@ export const nodes: MindNode[] = [
     index: 2,
     code: "N-03 · FLAGSHIP",
     title: "COGNIFLOW",
-    blurb: "Reading cognitive load off a webcam. The question I'm sitting with right now.",
+    blurb: "A local, webcam-only study companion. The thing I'm building right now.",
     position: [8.2, 1.9, 3.4],
     accent: "#ff5fd2",
     scale: 1.45,
@@ -74,7 +75,7 @@ export const nodes: MindNode[] = [
     index: 3,
     code: "N-04 · SEALED",
     title: "THE LAB",
-    blurb: "Where most of my work lives — and stays, until it survives my own standards.",
+    blurb: "Where most of my work lives, until it's good enough to leave.",
     position: [-6.2, -2.9, 5.0],
     accent: "#5fb8ff",
     scale: 1,
@@ -84,9 +85,19 @@ export const nodes: MindNode[] = [
     index: 4,
     code: "N-05 · UPLINK",
     title: "SIGNAL",
-    blurb: "Open channel. For questions worth sitting with — not for résumés.",
+    blurb: "Open channel. Say hello, ask something, or just poke around.",
     position: [1.4, 4.8, -8.2],
     accent: "#b8ff5f",
+    scale: 1,
+  },
+  {
+    id: "blog",
+    index: 5,
+    code: "N-06 · LOGBOOK",
+    title: "SP//LOG",
+    blurb: "Field notes from building software. What I'm learning, in the open.",
+    position: [-3.6, -5.0, -5.6],
+    accent: "#ffc24d",
     scale: 1,
   },
 ];
@@ -116,54 +127,72 @@ export const tour = {
 
 export const philosophy = {
   heading: "Limitless isn't a claim. It's a method.",
-  body: "Most people pick a lane and stay in it. I never have — and I'm not going to start. Hand me a problem in Python, in C++, in cognitive science, in some language I've never even opened, and the stack stops mattering. What matters is whether the question is worth sitting with. I learn what a problem demands, build what doesn't exist yet, and hold a standard high enough that most of what I make quietly stays in the lab.",
-  pullQuote: "That isn't indecision. That's R&D, applied to a life.",
+  body: "Most people pick a lane and stay in it. I never have, and I'm not going to start. Hand me a problem in Python, in C++, in cognitive science, in a language I've never opened, and the stack stops mattering. What matters is whether the question is worth the time. I learn what the problem needs, build the part that doesn't exist yet, and hold the bar high enough that most of what I make quietly stays in the lab.",
+  pullQuote: "That isn't indecision. It's R&D, pointed at a life.",
   originHeading: "HOW I GOT HERE",
   originParagraphs: [
-    "I started coding for the obvious reason — a good package, a good company. Then college happened, and it taught me the opposite of what I actually wanted: assignments instead of skill, a technical degree that technically taught nothing.",
-    "Somewhere in the middle of it, I fell for someone. I told her. She said yes, and she started pushing me toward goals I'd quietly stopped chasing. Right in the middle of that, I hit the darkest period of my life — real depression, the kind that changes how you see everything that comes after. She stayed through it. I'm on the other side now, and I see things differently because of it.",
-    "The first thing I saw clearly: college wasn't building anything in me, just burying it under coursework. So I left — my family didn't support it, and I made the call anyway, on my own terms. Not long after, I lost my grandfather, and I moved to Bengaluru to actually build something instead of talking about it.",
-    "The turn that mattered most: I built an app for Katha, a rough beta full of holes. Fixing it properly meant researching for the first time — and I fell for the research harder than I'd fallen for the app. That became my style.",
+    "I started coding for the obvious reason: a good job at a good company. Then college taught me the opposite of what I wanted. Assignments instead of skill. A technical degree that technically taught nothing.",
+    "Somewhere in the middle of it I fell for someone. I told her, she said yes, and she started pushing me back toward goals I'd quietly given up on. Then I hit the darkest stretch of my life. Real depression, the kind that changes how you see everything that comes after. She stayed through it. I'm on the other side now, and I see things differently because of it.",
+    "The first thing I saw clearly: college wasn't building anything in me, it was burying it under coursework. So I left. My family didn't back the call. I made it anyway. Not long after, I lost my grandfather, and I moved to Bengaluru to actually build something instead of talking about it.",
+    "The turn that mattered most was a rough app I built for Katha, full of holes. Fixing it properly meant doing real research for the first time, and I fell for the research harder than I'd fallen for the app. That's been my way of working ever since.",
   ],
-  originQuote: "Cogniflow is what happens when that style finally meets a question worth years, not weeks.",
+  originQuote: "CogniFlow is what happens when that way of working finally meets a question worth years, not weeks.",
 };
 
 export type SkillRow = { label: string; items: string[] };
 
 export const arsenal = {
   heading: "Not a checklist. A toolbox.",
-  sub: "Fluency isn't the goal — capability is. If a problem needs a tool I don't have yet, I pick it up and keep moving.",
+  sub: "Fluency isn't the point, capability is. If a problem needs a tool I don't have yet, I pick it up and keep moving.",
   rows: [
     {
       label: "LANGUAGES",
-      items: ["JavaScript", "TypeScript", "Python", "C", "C++"],
+      items: ["JavaScript", "TypeScript", "Python", "C", "C++", "Rust"],
     },
     {
       label: "FRAMEWORKS & MOTION",
-      items: ["React", "Next.js", "React Native", "Vite", "GSAP", "Three.js"],
+      items: ["React", "Next.js", "React Native", "Vite", "Tauri", "GSAP", "Three.js"],
     },
     {
       label: "DATA & INFRA",
-      items: ["MongoDB", "PostgreSQL", "REST APIs", "GraphQL", "Axios"],
+      items: ["MongoDB", "PostgreSQL", "REST APIs", "GraphQL", "WebAssembly"],
     },
   ] as SkillRow[],
 };
 
 export const cogniflow = {
-  status: "RESEARCH · IN PROGRESS · NOT YET LIVE",
-  oneLiner: "Reading cognitive load off a webcam.",
+  status: "RESEARCH · WORK IN PROGRESS",
+  oneLiner: "A local, webcam-only study companion that reflects your focus back to you.",
   abstract:
-    "Cogniflow estimates cognitive engagement in real time using nothing but a standard webcam — tracking pupil dynamics, blink behaviour, gaze stability, and facial tension to infer how hard a mind is working, moment to moment.",
+    "CogniFlow watches your webcam while you study and reads a few honest attention states — Focused, Drifting, Drowsy, Away. It nudges you only when you've slipped off task, and gives you a calm, honest review after the session. Everything runs on your own machine. No video ever leaves your computer, no accounts, no cloud.",
   closingLine:
-    "No wearables. No lab equipment. Just a camera, a hypothesis, and the data to back it up.",
-  method: ["Pupil dynamics", "Blink behaviour", "Gaze stability", "Facial tension"],
-  validation: ["NASA-TLX questionnaires", "N-back cognitive tests", "Retrospective user confirmation"],
-  tags: ["Computer Vision", "Cognitive Science", "Python", "Applied Research"],
+    "No wearables, no lab rig. Just a camera, a hypothesis, and a paper documenting the reasoning behind every design choice.",
+  /** the four coarse states + the machinery, shown under WHAT IT READS */
+  method: [
+    "Head direction — are you on the work surface",
+    "Eye-closure — blinks and drowsiness",
+    "Presence — are you actually there",
+    "An anti-flicker state machine so it doesn't twitch",
+  ],
+  /** what it deliberately refuses to do — the honesty of the project */
+  wontDo: [
+    "No 'cognitive load' number",
+    "No productivity score to feel guilty about",
+    "Nothing uploaded, nothing stored beyond local summaries",
+    "Shows a confidence level instead of pretending to be certain",
+  ],
+  paper:
+    "It's written up as a full research paper: a working system plus the evidence and honest limits behind every decision. Empirical validation against human ground truth is the next step, not a claim I'm making yet.",
+  tags: ["Computer Vision", "MediaPipe", "Tauri", "Privacy-first", "Applied Research"],
+  links: [
+    { label: "View on GitHub", href: "https://github.com/Patwaji/cogniflow" },
+    { label: "Read the paper", href: "https://github.com/Patwaji/cogniflow/blob/main/RESEARCH_PAPER.pdf" },
+  ],
 };
 
 export const lab = {
   heading: "More is brewing.",
-  body: "I build constantly — most of it never leaves this room. What's not here isn't gone; it's either still cooking, or it didn't survive contact with my own standards. Cogniflow made the cut. More will.",
+  body: "I build constantly, and most of it never leaves this room. What's missing isn't gone. It's either still cooking, or it didn't survive contact with my own standards. CogniFlow made the cut. More will.",
   teaser:
     "Coming to this space: playable experiments. Games, toys, things you can break. Each one will dock here as a new node in the mind.",
   buttonLabel: "DESTABILIZE THE MIND",
@@ -171,13 +200,30 @@ export const lab = {
 };
 
 export const signal = {
-  heading: "Got a question worth sitting with?",
-  sub: "This isn't the résumé version of me — I've got one of those elsewhere. This channel is for the interesting stuff.",
-  email: "hello@suryanshpatwa.dev",
+  heading: "Got something to build, or just want to talk?",
+  sub: "This is the fun channel, not the résumé one. That version of me lives elsewhere.",
+  email: "suryanshpatwa261@gmail.com",
   links: [
-    { label: "GitHub", href: "https://github.com/suryanshpatwa" },
-    { label: "LinkedIn", href: "https://linkedin.com/in/suryanshpatwa" },
-    { label: "X / Twitter", href: "https://x.com/suryanshpatwa" },
+    { label: "GitHub", href: "https://github.com/Patwaji" },
+    { label: "LinkedIn", href: "https://www.linkedin.com/in/suryansh-patwa-089153358/" },
+    { label: "X / Twitter", href: "https://x.com/suryansh_gyaani" },
+  ],
+};
+
+export const blog = {
+  heading: "Field notes from building software.",
+  sub: "I write while I build — what broke, what I changed my mind about, what the research actually said. Rough, honest, in the open.",
+  href: "https://blogs.suryanshpatwa.in",
+  cta: "Read the log →",
+  posts: [
+    {
+      title: "What happens after you press Enter in an AI IDE",
+      href: "https://blogs.suryanshpatwa.in/articles/what-happens-after-you-press-enter/",
+    },
+    {
+      title: "I built a webcam focus tracker, then deleted the focus score",
+      href: "https://blogs.suryanshpatwa.in/articles/quiet-study-companion/deleted-the-score/",
+    },
   ],
 };
 

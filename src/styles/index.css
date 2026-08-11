@@ -643,6 +643,24 @@ a { color: inherit; }
 .signal-links a:hover { color: var(--ink); padding-left: 10px; }
 .signal-links a::after { content: "↗"; color: var(--panel-accent, var(--accent)); }
 
+/* — blog / logbook — */
+.blog-list { display: flex; flex-direction: column; margin-bottom: 10px; }
+.blog-post {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  text-decoration: none;
+  font-family: var(--display);
+  font-size: clamp(0.98rem, 2.4vw, 1.15rem);
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 16px 2px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-dim);
+  transition: color 0.3s, padding-left 0.3s;
+}
+.blog-post:last-of-type { border-bottom: 1px solid var(--line); }
+.blog-post:hover { color: var(--ink); padding-left: 10px; }
+.blog-post::after { content: "→"; color: var(--panel-accent, var(--accent)); }
+
 .colophon {
   margin-top: 40px;
   font-size: 10px;
