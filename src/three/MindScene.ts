@@ -527,6 +527,7 @@ export class MindScene {
       { id: "arsenal", file: "arsenal-cluster", motion: "tumble", fit: 1.15, glow: true },
       { id: "lab", file: "lab-capsule", motion: "tumble", fit: 1.15, glow: true },
       { id: "signal", file: "signal-beacon", motion: "tumble", fit: 1.15, glow: true },
+      { id: "blog", file: "blog-codex", motion: "tumble", fit: 1.15, glow: true },
     ] as const;
     // ponytail: shipped GLBs are repacked derivatives with extensionsRequired:[]
     // (no draco/meshopt/ktx2), so a bare GLTFLoader is sufficient. If a raw

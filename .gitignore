@@ -26,3 +26,11 @@ dist-ssr
 
 .devmate/
 package-lock.json
+
+.playwright-mcp/
+
+# local test artifacts
+.playwright-mcp/
+/blog-node.png
+/blog-node-fixed.png
+/mind-scene.png
